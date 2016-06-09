@@ -146,15 +146,13 @@ function create_map(input_type,callback,elm,type,clsname){
 
 function guest_registration(type,clsname)
 {
-    
+    //alert(type);
 	//alert("xdfgdgds");
 	var latlon = $("#latlang").val();
 
       	var p=0;
-        var errors='';
-        var type = '';
-        
-        type = 'current';
+        var errors='';        
+        var addtype = 'current';
 
         
       	if($('#phone').val()=='' || $('#phone').val().length<=3){
@@ -170,8 +168,6 @@ function guest_registration(type,clsname)
              
             errors += "Sorry, browser does not support geolocation! \n"; p=1;
 
-            if(type=='auto')
-                return false;
           } 
 
         }
@@ -182,7 +178,7 @@ function guest_registration(type,clsname)
               //latlon = $('#map_pos').val();
               latlon = $('.popover-content #guest_address').val();
               
-              type   = 'manual';          
+              addtype   = 'manual';          
               
             }
             else
@@ -199,7 +195,7 @@ function guest_registration(type,clsname)
       		
         ajax_loader(1);
 
-        var data = {latlon:latlon,phone:$('#phone').val(),display:$('#display_name').val(),type:type};
+        var data = {latlon:latlon,phone:$('#phone').val(),display:$('#display_name').val(),type:addtype};
 
         $.post(site_url+'/home/guest_registration', data, function(response){
 
@@ -225,13 +221,14 @@ function guest_registration(type,clsname)
 
 function user_update(type,clsname)
 {
-  
-        var latlon = $("#latlang").val();
+  //alert("xdfgdgds");
+  var latlon = $("#latlang").val();
+
         var p=0;
         var errors = '';
-        var type   = '';
+        var addtype   = '';
         
-        type = 'current';
+        addtype = 'current';
 
         
         if($('#phone').val()=='' || $('#phone').val().length<=3){
@@ -254,7 +251,7 @@ function user_update(type,clsname)
               
               latlon = $('.popover-content #guest_address').val();
               
-              type   = 'manual';          
+              addtype   = 'manual';          
               
             }
             else
@@ -271,7 +268,7 @@ function user_update(type,clsname)
           
         ajax_loader(1);
 
-        var data = {latlon:latlon,phone:$('#phone').val(),display:$('#display_name').val(),group_id:$('#group_id').val(),prev_channel:$('#prev_channel').val()};
+        var data = {latlon:latlon,phone:$('#phone').val(),display:$('#display_name').val(),group_id:$('#group_id').val(),prev_channel:$('#prev_channel').val(),type:addtype};
 
         $.post(site_url+'/home/user_update', data, function(response){
 
