@@ -254,7 +254,7 @@
           })(marker, i));
           
             
-          var group_admin_icon = "";
+          var group_admin_icon = "", invisible_icon = "";
 
           groupname  = groupname.toLowerCase();
           var locat  = locations[i][5].toLowerCase();
@@ -269,7 +269,9 @@
             //centger on current position
             posclick(sel_group_id);
           }
-
+            
+            invisible_icon = '<span class="invisible_icon">&nbsp;</span>';
+            
           var invisible = locations[i][6];
             
           if(invisible == 0) { 
@@ -277,7 +279,7 @@
           }
           
           if(invisible == 1) { 
-            filters1 += '<li><span class="name">'+locations[i][0].substring(0,13)+'</span>'+group_admin_icon+'</li>';
+            filters1 += '<li><span class="name">'+locations[i][0].substring(0,13)+'</span>'+group_admin_icon+invisible_icon+'</li>';
           }
 
         }

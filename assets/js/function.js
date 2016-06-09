@@ -225,9 +225,8 @@ function guest_registration(type,clsname)
 
 function user_update(type,clsname)
 {
-  //alert("xdfgdgds");
-  var latlon = $("#latlang").val();
-
+  
+        var latlon = $("#latlang").val();
         var p=0;
         var errors = '';
         var type   = '';

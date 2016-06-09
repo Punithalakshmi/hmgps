@@ -285,7 +285,8 @@ class Home extends CI_Controller {
         
         $this->db->query("update user_groups set is_visible=1 where group_id='".$grp_id."' and user_id='".$user_id."'");
         
-        
+        echo "success";
+        exit;
     } 
     
 	function get_user_details(){
