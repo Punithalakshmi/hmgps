@@ -38,7 +38,6 @@ class Home extends CI_Controller {
 
 		 $this->data['user_info'] = "";
 	     $this->get_user_details();
-       
      
     }
 

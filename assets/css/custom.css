@@ -1782,3 +1782,7 @@ span.popover-tr { right: 5px;
 top: 16px; }
 
 span.popover-br { right: 2px; bottom: 12px; }
+
+#google_image_div{ width:150px !important;}
+
+#google_image_div img.img_ad {width: 100% !important;}
