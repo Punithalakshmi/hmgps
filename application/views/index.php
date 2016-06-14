@@ -1,7 +1,6 @@
     <div class="container patop add-container"><!-- Banner area Start-->
-      
+     
       <?php if(!empty($mobile_header) && ($mobile_header == 'yes')) { ?>
-      
       <div class="google-add right-add01">
         <!-- Google ads -->
         
@@ -17,6 +16,7 @@
         </script>
         
     </div>
+
      <?php } ?>
       
       <div class="col-sm-1"> &nbsp; </div>
@@ -60,36 +60,29 @@
       <div style="clear: both;"></div>
       
   <?php if(!empty($mobile_header) && ($mobile_header == 'no')) { ?>     
-     <div class="google-add right-add1">
-    
-        <!-- Google ads -->
-        <ins class="adsbygoogle ad-unit-responsive"
-             style="display:block"
-             data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="vertical">
-        </ins>
-    
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
+     
+<div class="google-add right-add1">
+       
+<ins class="adsbygoogle"
+     style="display:inline-block;width:120px;height:600px"
+     data-ad-client="ca-pub-3938942410095568"
+     data-ad-slot="2305973344"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
     </div>
 
     <div class="google-add right-add2">
-        <!-- Google ads -->
-        
-        <ins class="adsbygoogle ad-unit-responsive"
-             style="display:block;"
-             data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="vertical">
-        </ins>
-        
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-        
+      
+<ins class="adsbygoogle"
+     style="display:inline-block;width:120px;height:600px"
+     data-ad-client="ca-pub-3938942410095568"
+     data-ad-slot="2137202947"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
     </div>
+
   <?php }  ?> 
    
 </div>
@@ -97,43 +90,36 @@
     <!-- Banner area End-->
     
     <hr />
-    <div class="container padleft padright"><!-- Content area Start-->
+    <div class="container padleft padright">
+    <!-- Content area Start-->
     <?php if(!empty($mobile_header) && ($mobile_header == 'no')) { ?>
-    <div class="google-add right-add3">
-        <!-- Google ads -->
-        
-        <ins class="adsbygoogle ad-unit-responsive"
-             style="display:block;"
-             data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="vertical">
-        </ins>
-        
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-        
+    
+   <div class="google-add right-add3">
+    
+<ins class="adsbygoogle"
+     style="display:inline-block;width:120px;height:600px"
+     data-ad-client="ca-pub-3938942410095568"
+     data-ad-slot="1718400547"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
     </div>
     
       <div class="google-add right-add4">
-        <!-- Google ads -->
-        
-        <ins class="adsbygoogle ad-unit-responsive"
-             style="display:block;"
-             data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="vertical">
-        </ins>
-        
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-        
+         
+<ins class="adsbygoogle"
+     style="display:inline-block;width:120px;height:600px"
+     data-ad-client="ca-pub-3938942410095568"
+     data-ad-slot="8962465744"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
     </div>
+
     <?php }else { ?>
-    <div class="google-add right-add00">
-        <!-- Google ads -->
-        
+   
+ <div class="google-add right-add00">
+       
         <ins class="adsbygoogle ad-unit-responsive"
              style="display:block;"
              data-ad-client="ca-pub-3938942410095568"
@@ -146,6 +132,7 @@
         </script>
         
     </div>
+
      <?php } ?>
       <div class="row hmgps-content-area content-text">
         
@@ -197,25 +184,23 @@
 
 
 <div class="col-sm-1"> &nbsp; </div>
+
+
+
+<?php if(!empty($mobile_header) && ($mobile_header == 'no')) { ?>
 <div class="col-sm-10 add-center">
 
-
-<?php //for($i=1;$i<5;$i++){?>
-<div class="google-add right-add0<?php //echo $i;?>" >
 <!-- Google ads -->
-<ins class="adsbygoogle ad-unit-responsive"
-     style="display:block;"
+<ins class="adsbygoogle"
+     style="display:block"
      data-ad-client="ca-pub-3938942410095568"
      data-ad-slot="1328814540"
-     data-ad-format="horizontal">
-</ins>
+     data-ad-format="horizontal"></ins>
 <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 </div>
-
-
-</div>
+<?php } ?>
 <div class="col-sm-1"> &nbsp; </div>
 
 <div style="clear: both;"></div>
@@ -235,22 +220,22 @@
   .right-add2 { position:absolute; top:15%; right:0; width:10%; z-index:99999; height:60px;}
   .right-add4 { position:absolute; top:35%; right:0; width:10%; z-index:99999; height:60px;}
   .right-add3 { position:absolute; top:35%; left:0; width:10%; z-index:99999; height:60px;}
-  .right-add1 {position:absolute;  left:0; top:15%; width:10%; z-index:99999; height:60px;}
+  .right-add1 {position:absolute;  left:0; top:15%; width:10%; z-index:99999; height:60px;} 
   .right-add2 iframe {
-      height: 400px; 
+      height: 380px; 
    }
    .right-add1 iframe {
-      height: 400px; 
+      height: 380px; 
    }
    
   .right-add3 iframe {
-      height: 400px;
+      height: 380px;
       margin-top:160px;
       
   }
   
   .right-add4 iframe {
-      height: 400px;
+      height: 380px;
       margin-top:160px;
       
   }
@@ -272,5 +257,6 @@
 
 
 </style>
+
 
     <!-- Content area End-->
