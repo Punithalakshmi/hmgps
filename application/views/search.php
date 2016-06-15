@@ -45,6 +45,12 @@
         </script>
         
     </div>
+    <style type="text/css">
+.google-add.right-add02 {
+    margin: auto;
+    text-align: center;
+}
+    </style>
     
 <div class="container-fluid search"><!-- Content area Start-->
       <div class="row participant">

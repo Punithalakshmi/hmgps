@@ -253,7 +253,10 @@
 .right-add7 { position: absolute; width:120px; height:600px; top:0; left:-20px; border:2px solid pink}
 .right-add6 { position: absolute; width:120px; height:600px; top:0; right:-20px; border:2px solid yellow}
 
-.add-center { margin-left:150px; margin-right:10px; min-height:80px; }
+.add-center { margin-left: auto;
+margin-right: auto;
+min-height: 80px;
+text-align: center; }
 
 /*.add-center .right-add0 { position: absolute; left:0; right:0; margin:auto;}*/
 
