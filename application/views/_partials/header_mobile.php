@@ -129,6 +129,7 @@
                     <span class="cr my-location"><i class="cr-icon fa fa-check"></i></span>
                     <span class="m-keyboard"><img src="<?php echo base_url();?>assets/image/04_maps.png" alt="map" /></span>
                     <span class="allow-locate">Allow my location to be shown if browser permits</span>
+                    <span class="allow-locate">My Mobile Location</span>
                 </label>
                 
               </div>

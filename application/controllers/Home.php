@@ -391,7 +391,7 @@ class Home extends CI_Controller {
    			if($register['status']=='success'){
 
 	   			//user position save
-	   			$this->user_position_save($register['user_id'],$latlong[0],$latlong[1],FALSE);
+	   			$this->user_position_save($register['user_id'],$latlong[0],$latlong[1],FALSE,$type);
 	   			
 
 	   			$cookie = array(
@@ -439,7 +439,7 @@ class Home extends CI_Controller {
         $latlong     = (!empty($type) && ($type == 'current'))?explode(":",$latlong):convert_latlon($latlong);
 
 		$outputs=array();
-
+        
 		
 		$this->service_param['channel_id'] 	 = $phone;
 		$this->service_param['display_name'] = $display; 			
@@ -460,7 +460,7 @@ class Home extends CI_Controller {
 
 				if($latlong[0]!==null && $latlong[1]!==null){
 				
-					$this->user_position_save(get_cookie('map_user_id'),$latlong[0],$latlong[1],FALSE);
+					$this->user_position_save(get_cookie('map_user_id'),$latlong[0],$latlong[1],FALSE,$type);
 				}
 					
 	   		}	
@@ -483,7 +483,7 @@ class Home extends CI_Controller {
 		exit;	
 	}
 
-	function user_position_save($user_id,$lat,$lon,$resp=TRUE)
+	function user_position_save($user_id,$lat,$lon,$resp=TRUE,$map_type)
 	{
 		if((int)$user_id && $lat!='' && $lon!='')
 		{
@@ -493,6 +493,7 @@ class Home extends CI_Controller {
 			$this->service_param['lon'] 		= $lon;
 			$this->service_param['accuracy'] 	= 0;
 			$this->service_param['allow_empty'] = 1;
+            $this->service_param['map_type']    = $map_type;
 
 	   		$pos = $this->rest->get('user_position_save', $this->service_param, 'json');
 

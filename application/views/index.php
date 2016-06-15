@@ -70,9 +70,11 @@
 <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-    </div>
+    <!--
+</div>
 
     <div class="google-add right-add2">
+-->
       
 <ins class="adsbygoogle"
      style="display:inline-block;width:120px;height:600px"
@@ -94,7 +96,7 @@
     <!-- Content area Start-->
     <?php if(!empty($mobile_header) && ($mobile_header == 'no')) { ?>
     
-   <div class="google-add right-add3">
+   <div class="google-add right-add2">
     
 <ins class="adsbygoogle"
      style="display:inline-block;width:120px;height:600px"
@@ -103,9 +105,11 @@
 <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-    </div>
+   <!--
+ </div>
     
       <div class="google-add right-add4">
+-->
          
 <ins class="adsbygoogle"
      style="display:inline-block;width:120px;height:600px"
@@ -192,10 +196,9 @@
 
 <!-- Google ads -->
 <ins class="adsbygoogle"
-     style="display:block"
+     style="display:inline-block;width:700px;height:100px"
      data-ad-client="ca-pub-3938942410095568"
-     data-ad-slot="1328814540"
-     data-ad-format="horizontal"></ins>
+     data-ad-slot="2305973344"></ins>
 <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
@@ -217,25 +220,24 @@
     text-align: center;
 }
 
-  .right-add2 { position:absolute; top:15%; right:0; width:10%; z-index:99999; height:60px;}
-  .right-add4 { position:absolute; top:35%; right:0; width:10%; z-index:99999; height:60px;}
-  .right-add3 { position:absolute; top:35%; left:0; width:10%; z-index:99999; height:60px;}
-  .right-add1 {position:absolute;  left:0; top:15%; width:10%; z-index:99999; height:60px;} 
-  .right-add2 iframe {
-      height: 380px; 
-   }
+  .right-add2 { position:absolute; top:15%; right:0; width:10%; z-index:99999; height:auto;}
+  .right-add4 { position:absolute; top:35%; right:0; width:10%; z-index:99999; height:auto;}
+  .right-add3 { position:absolute; top:35%; left:0; width:10%; z-index:99999; height:auto;}
+  .right-add1 {position:absolute;  left:0; top:15%; width:10%; z-index:99999; height:auto;} 
+
+  .right-add2 iframe {margin-bottom: 10px; height: 600px; }
    .right-add1 iframe {
-      height: 380px; 
+     margin-bottom: 10px; height: 600px; 
    }
    
   .right-add3 iframe {
-      height: 380px;
+      height: 600px;
       margin-top:160px;
       
   }
   
   .right-add4 iframe {
-      height: 380px;
+      height: 600px;
       margin-top:160px;
       
   }
@@ -251,7 +253,7 @@
 .right-add7 { position: absolute; width:120px; height:600px; top:0; left:-20px; border:2px solid pink}
 .right-add6 { position: absolute; width:120px; height:600px; top:0; right:-20px; border:2px solid yellow}
 
-.add-center {  min-height:90px}
+.add-center { margin-left:150px; margin-right:10px; min-height:80px; }
 
 /*.add-center .right-add0 { position: absolute; left:0; right:0; margin:auto;}*/
 

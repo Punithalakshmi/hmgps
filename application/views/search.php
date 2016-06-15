@@ -269,7 +269,6 @@
             //centger on current position
             posclick(sel_group_id);
           }
-            
             invisible_icon = '<span class="invisible_icon">&nbsp;</span>';
             
           var invisible = locations[i][6];
