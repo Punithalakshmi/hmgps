@@ -298,26 +298,23 @@ class Home extends CI_Controller {
 
 			$userchk = (array)$userchk;
 
-			if(!empty($userchk) && $userchk['status']=='error')
-			{
+			if(!empty($userchk) && $userchk['status']=='error'){
 				delete_cookie('map_user_id');
-
 				$this->service_param['user_id'] = 0;
 			}	
 		}
 
 	 $join_key = get_cookie('map_search');
 
-		if(!empty($this->service_param['user_id']))
-		{
+		if(!empty($this->service_param['user_id'])){
+		  
 			$this->service_param['join_key'] = $join_key;
 			$userdet = $this->rest->get('get_channel_byuser', $this->service_param, 'json');
 
 			$userdet = (array)$userdet;
 
-			if(!empty($userdet) && $userdet['status']=='success')
-			{	
-				$this->data['user_info'] = array('channel_id' => $userdet['user']->channel_id, 'display_name'=>$userdet['user']->display_name, 'user_id'=>$userdet['user']->user_id,'group_id'=>$userdet['user']->group_id,'joined_group'=>$userdet['joined_group']);
+			if(!empty($userdet) && $userdet['status']=='success'){	
+				$this->data['user_info'] = array('channel_id' => $userdet['user']->channel_id, 'display_name'=> $userdet['user']->display_name, 'user_id'=> $userdet['user']->user_id,'group_id'=> $userdet['user']->group_id,'joined_group'=> $userdet['joined_group']);
 			}
 		}
 		else
