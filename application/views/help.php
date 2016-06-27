@@ -1,35 +1,30 @@
  <?php if(!empty($mobile_header) && ($mobile_header == 'no')) { ?>
        
          <div class="google-add right-add25">
-        
-        <!-- Google ads -->
-        
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="vertical">
-        </ins>
-        
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-        
-        </div>
+       
+       
+<!-- Help Page ads -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:120px;height:600px"
+     data-ad-client="ca-pub-3938942410095568"
+     data-ad-slot="2305973344"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+      
+ </div>
         
         <div class="google-add right-add26">
-        <!-- Google ads -->
-        
-        <ins class="adsbygoogle"
-             style="display:block;"
-             data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="vertical">
-        </ins>
-        
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
+
+
+<!-- Help Page right side ad -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:120px;height:600px"
+     data-ad-client="ca-pub-3938942410095568"
+     data-ad-slot="2137202947"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
         
         </div>
     <?php } else{ ?>
@@ -76,15 +71,22 @@
     </div>
     <!-- Content area End-->
     <style>
-    .google-add{width:160px;}
-  .right-add25 { position:absolute; top:25%; right:0; width:10%; z-index:99999; height:60px;}
-  .right-add26 { position:absolute; top:25%; left:0; width:10%; z-index:99999; height:60px;}
+    .google-add {
+    width: 160px;
+}
+    .right-add25 {   height: auto;
+    position: absolute;
+    right: 0;
+    top: 20%;
+    width: 10%;
+    z-index: 99999;
+    }
+  .right-add26 { height: auto;
+    left: 0;
+    position: absolute;
+    top: 20%;
+    width: 10%;
+    z-index: 99999;}
   
-  .right-add25 iframe {
-      height: 400px; 
-   }
-   .right-add26 iframe {
-      height: 400px; 
-   }
   
 </style>

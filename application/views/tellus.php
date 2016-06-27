@@ -3,15 +3,11 @@
        
          <div class="google-add right-add23">
         
-        <!-- Google ads -->
-        
+        <!-- Help Page right side ad -->
         <ins class="adsbygoogle"
-             style="display:block"
+             style="display:inline-block;width:120px;height:600px"
              data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="vertical">
-        </ins>
-        
+             data-ad-slot="2137202947"></ins>
         <script>
         (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
@@ -21,13 +17,10 @@
         <div class="google-add right-add24">
         <!-- Google ads -->
         
-        <ins class="adsbygoogle"
-             style="display:block;"
+       <ins class="adsbygoogle"
+             style="display:inline-block;width:120px;height:600px"
              data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="vertical">
-        </ins>
-        
+             data-ad-slot="8962465744"></ins>
         <script>
         (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
