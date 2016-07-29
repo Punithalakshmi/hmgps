@@ -16,6 +16,11 @@ $("#guest_current").click(function(){
    $("#popover").popover('hide'); 
 });
 
+//delete the set zoomlevel cookie
+$(".go-search").click(function(){
+  document.cookie="myMapCookie=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+});
+
 $("#popover").click(function(){
    var data = {};
        var uid = $(this).attr("data-uid");

@@ -102,7 +102,7 @@
 
     var markers = new Array();
 
-    var map = '',geocoder = '';
+    var map = '',geocoder = '', savedMapLat='', savedMapLng='', savedMapZoom='';
 
     var reloadzoomlvl = '';
 
@@ -110,7 +110,9 @@
           maxWidth: 250
         });
     window.localStorage.removeItem('mapzoom');
-
+   
+   // document.cookie="myMapCookie=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+    
     map_search(locations,contents,user_id,1);  
 
     function map_search(locations,contents,user_id,stable){
@@ -136,17 +138,34 @@
             },120000);
         }  
 
-        var centerlat = 40.71;
-        var centerlon = -74.00;
-        var zoomlvl = 2;
-
-        if(locations.length > 0){
-
-        	centerlat = (locations[0][1]!=0)?locations[0][1]:38.53;
-        	centerlon = (locations[0][2]!=0)?locations[0][2]:-101.42;
-        	zoomlvl = (locations[0][1]!=0)?13:3;
-
+        
+        
+        var gotCookieString = getCookie("myMapCookie"); 
+        var splitStr        = gotCookieString.split("_");
+         savedMapLat        = parseFloat(splitStr[0]);
+         savedMapLng        = parseFloat(splitStr[1]);
+         savedMapZoom       = parseFloat(splitStr[2]);
+         
+        var centerlat = "";
+        var centerlon = "";
+        var zoomlvl   = "";
+        
+        if(splitStr!=''){
+            centerlat = (savedMapLat!=0)?savedMapLat:38.53;
+            centerlon = (savedMapLng!=0)?savedMapLng:-101.42;
+            zoomlvl   = (savedMapZoom!=0)?savedMapZoom:3;
         }
+        else
+        {
+            centerlat = (locations[0][1]!=0)?locations[0][1]:38.53;
+            centerlon = (locations[0][2]!=0)?locations[0][2]:-101.42;
+            zoomlvl   = (locations[0][1]!=0)?20:3;
+        }
+        //if(locations.length > 0){
+//        	centerlat = (locations[0][1]!=0)?locations[0][1]:38.53;
+//        	centerlon = (locations[0][2]!=0)?locations[0][2]:-101.42;
+//        	zoomlvl   = (locations[0][1]!=0)?13:3;
+//        }
         
         //remove the localstroage
         window.localStorage.removeItem('mapzoom'); 
@@ -178,8 +197,7 @@
           scaleControl:true,
           scrollwheel:true,
           panControl: true,
-          panControlOptions: {
-                                position: google.maps.ControlPosition.TOP_RIGHT
+          panControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT
                               },
          
           overviewMapControl:true,
@@ -196,6 +214,8 @@
         var geoloccontrol = new klokantech.GeolocationControl(map, 15);
 
         }
+        //loadMapState();
+        
         geocoder = new google.maps.Geocoder();   
 
         google.maps.event.addListener(map, 'dragstart', function() {
@@ -242,6 +262,7 @@
             animation: google.maps.Animation.DROP,
             title: locations[i][0]+'\nUpdated : '+formattime(dat),
             optimized: false,
+            draggable:true,
             icon:site_url+'/mapicon/index/'+locations[i][0]+'/'+locations[i][3]+'/'+locations[i][4]
             
           });
@@ -273,7 +294,9 @@
             partcipanthead += '<li class="text-center map-admin">Administrator : '+locations[i][0].substring(0,10)+'</li>';
 
             //centger on current position
-            posclick(sel_group_id);
+            if(splitStr == ''){
+                posclick(sel_group_id);
+            }
           }
             invisible_icon = '<span class="invisible_icon">&nbsp;</span>';
             
@@ -289,11 +312,13 @@
 
         }
         
-        google.maps.event.addListener(map, "dblclick", function(event) { 
+        google.maps.event.addListener(map, "dblclick", function(event) {
                placeMarker(event.latLng); 
-            
         });
-            
+        
+        
+        // as a suggestion you could use the event listener to save the state when zoom changes or drag ends
+        google.maps.event.addListener(map, 'tilesloaded', tilesLoaded);    
             
         if(filters1){
           filters += '<li class="text-center invisible-head">Invisible Participants</li>';
@@ -302,12 +327,11 @@
         
         document.getElementById("participants-list").innerHTML = partcipanthead + filters;
 
-
-        
     }
     
     var marker;    
     function placeMarker(location) {
+       
         if(marker){ 
             marker.setPosition(location); 
         }else
@@ -359,15 +383,11 @@
 
     function posclick(i) 
     {
-        
          var bounds = new google.maps.LatLngBounds();
          
          bounds.extend(markers[i].position);
          map.fitBounds(bounds);
-
          map.setCenter(markers[i].getPosition());
-         
-         
     }
    
     function rotate90() {
@@ -469,6 +489,65 @@
              
                 location.href='<?php echo site_url();?>/search/'+channel_id;  
         });     
-  }    
+  }   
+  
+  function tilesLoaded() {
+ 
+    google.maps.event.clearListeners(map, 'tilesloaded');
+    google.maps.event.addListener(map, 'zoom_changed', saveMapState);
+    google.maps.event.addListener(map, 'dragend', saveMapState);
+}   
+
+
+// functions below
+
+function saveMapState() 
+{ 
+    
+    var mapZoom=map.getZoom(); 
+    var mapCentre=map.getCenter(); 
+    
+    var mapLat=mapCentre.lat(); 
+    var mapLng=mapCentre.lng(); 
+    var cookiestring=mapLat+"_"+mapLng+"_"+mapZoom; 
+    setCookie("myMapCookie",cookiestring, 30); 
+     
+     placeMarker(mapCentre); 
+} 
+
+function loadMapState() 
+{ 
+    var gotCookieString = getCookie("myMapCookie"); 
+    var splitStr        = gotCookieString.split("_");
+    var savedMapLat     = parseFloat(splitStr[0]);
+    var savedMapLng     = parseFloat(splitStr[1]);
+    var savedMapZoom    = parseFloat(splitStr[2]);
+    if ((!isNaN(savedMapLat)) && (!isNaN(savedMapLng)) && (!isNaN(savedMapZoom))) {
+        map.setCenter(new google.maps.LatLng(savedMapLat,savedMapLng));
+        map.setZoom(savedMapZoom);
+    }
+}
+
+function setCookie(c_name,value,exdays) {
+    var exdate=new Date();
+    exdate.setDate(exdate.getDate() + exdays);
+    var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+    document.cookie=c_name + "=" + c_value;
+}
+
+function getCookie(c_name) {
+    var i,x,y,ARRcookies=document.cookie.split(";");
+    for (i=0;i<ARRcookies.length;i++)
+    {
+      x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+      y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+      x=x.replace(/^\s+|\s+$/g,"");
+      if (x==c_name)
+        {
+        return unescape(y);
+        }
+      }
+    return "";
+} 
     
 </script>
