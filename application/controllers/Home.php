@@ -79,8 +79,8 @@ class Home extends CI_Controller {
 				$joinkey = $map_cookie;
 			}	
 
-			$user_id= get_cookie('map_user_id');
-
+			$user_id = get_cookie('map_user_id');
+             
 			if(!empty($user_id)){				
 				$cookie = array(
 						'name' => 'map_user_id',
@@ -89,7 +89,6 @@ class Home extends CI_Controller {
 						'path'   => '/',
 						);
 				set_cookie($cookie);
-
 			}
 
 			//set search value to cookie and expire time 1 hour
@@ -216,7 +215,7 @@ class Home extends CI_Controller {
                              if($this->data['user_info']['channel_id'] == $channel_id) {
                                     $str .='<li><a onclick="invisible_participant('.$val->user->profile->id.','.$groups['id'].')"><img src="'.base_url().'assets/image/invisible_participant_icon.png" target="_blank" alt="Invisible Participant" /></a></li>';
                                 } 
-                              $str .='<li><input type="checkbox" value="track" class="track_user" data-chid="'.$channel_id.'" />Track User</li>';  
+                              $str .='<li><input type="checkbox" value="track" class="track_userr" data-chid="'.$channel_id.'" data-mapsearch="'.get_cookie('map_search').'" data-uid="'.get_cookie('map_user_id').'" onclick="trackuser();" />Track User</li>';  
 							$str .= '</ul>
 
 							</div>';

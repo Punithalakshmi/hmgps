@@ -88,6 +88,7 @@
 
 <script>
 
+ 
     if($('div[id="header_toggle"]').text())
       $('#header_toggle').hide();
 
@@ -111,7 +112,9 @@
         });
     window.localStorage.removeItem('mapzoom');
    
-   // document.cookie="myMapCookie=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+    var trackingUser = getCookie("trackinguser");
+    var trackedUser  = getCookie("trackeduser");
+    
     
     map_search(locations,contents,user_id,1);  
 
@@ -303,7 +306,17 @@
           var invisible = locations[i][6];
             
           if(invisible == 0) { 
-            filters += '<li><div class="p-parti"><span class="name">'+locations[i][0].substring(0,13)+'</span><span class="name">'+locations[i][0].substring(0,13)+'</span></div>'+group_admin_icon+'<div class="p-find-iocn"><a href="javascript:posclick('+ i + ')" class="myposition sprite-image">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
+             var gpus = locations[i][0].substring(0,13);
+             var highlight_classname = '';
+             if((user_id == trackingUser) && (gpus == trackedUser) ){
+               highlight_classname = 'highlight'; 
+             }
+             else
+             {
+                highlight_classname = 'sprite-image'; 
+             }
+             
+            filters += '<li><div class="p-parti"><span class="name">'+locations[i][0].substring(0,13)+'</span><span class="name">'+locations[i][5].substring(0,13)+'</span></div><div class="p-find-iocn">'+group_admin_icon+'<a href="javascript:posclick('+ i + ')" class="myposition '+highlight_classname+'">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
           }
           
           if(invisible == 1) { 
@@ -371,9 +384,6 @@
     {
         if(tag == 1 )
          google.maps.event.trigger(markers[i], "click");
-
-         var participant_track= ""; 
-             setCookie("ParticipantTrack",participant_track, '');
             
          var bounds = new google.maps.LatLngBounds();
         
@@ -403,6 +413,8 @@
 
     function closeinfowindow(){
         infowindow.close();
+        setTimeout(function(){ map.setZoom(12); },2000);
+       
     }
     
  
@@ -428,7 +440,8 @@
         
     });
 
-
+   
+   
   
   function user_position_save(user_id){
      
@@ -542,17 +555,38 @@ function setCookie(c_name,value,exdays) {
 
 function getCookie(c_name) {
     var i,x,y,ARRcookies=document.cookie.split(";");
+   
     for (i=0;i<ARRcookies.length;i++)
     {
       x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
       y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
       x=x.replace(/^\s+|\s+$/g,"");
-      if (x==c_name)
-        {
+      
+       if (x==c_name){
+        
         return unescape(y);
-        }
+       }
       }
     return "";
 } 
-    
+
+function trackuser()
+{
+       
+      var uid = $(".track_userr").attr("data-uid");
+      var sid = $(".track_userr").attr("data-mapsearch");
+      var cid = $(".track_userr").attr("data-chid");
+      
+      var al_uid = getCookie("trackinguser");
+      
+      if(uid == al_uid) {
+        setCookie("trackeduser",cid,2);
+      }
+      else
+      {
+         setCookie("trackeduser",cid,2);
+         setCookie("trackinguser",uid,2);
+         setCookie("trackmapID",sid,2);
+      }
+}
 </script>

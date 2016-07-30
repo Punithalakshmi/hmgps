@@ -1666,8 +1666,17 @@ input#phone,input#display_name {
     padding: 0 !important;
     border:1px solid transparent;
     margin: 0 5px 5px 0;
-   
+} 
 
+#participants-list .highlight { 
+    display:inline-block !important;
+    width:25px !important; 
+    height:25px !important; 
+    background:url("../image/highlight.png") no-repeat !important;
+    background-size: cover;
+    padding: 0 !important;
+    border:1px solid transparent;
+    margin: 0 5px 5px 0; background-size:100% !important;
 }
 
 #participants-list .group_admin { background-position: 0  0; }
@@ -1819,6 +1828,6 @@ body #participants-list .map-list-label .name {
 
 }
 
-#participants-list .sprite-image{margin: 0 0 3px;}
+#participants-list .sprite-image{margin: 0 4px 3px;}
 
-#participants-list{min-width: 220px;}
+#participants-list{min-width: 250px;}
