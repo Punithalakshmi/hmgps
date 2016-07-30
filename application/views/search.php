@@ -303,7 +303,7 @@
           var invisible = locations[i][6];
             
           if(invisible == 0) { 
-            filters += '<li><span class="name">'+locations[i][0].substring(0,13)+'</span>'+group_admin_icon+'<a href="javascript:posclick('+ i + ')" class="myposition sprite-image">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></li>';
+            filters += '<li><div class="p-parti"><span class="name">'+locations[i][0].substring(0,13)+'</span><span class="name">'+locations[i][0].substring(0,13)+'</span></div>'+group_admin_icon+'<div class="p-find-iocn"><a href="javascript:posclick('+ i + ')" class="myposition sprite-image">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
           }
           
           if(invisible == 1) { 
@@ -313,7 +313,7 @@
         }
         
         google.maps.event.addListener(map, "dblclick", function(event) {
-               placeMarker(event.latLng); 
+               placeMarker(event.latLng,'dbclick'); 
         });
         
         
@@ -330,16 +330,19 @@
     }
     
     var marker;    
-    function placeMarker(location) {
+    function placeMarker(location,eventtype = '') {
        
         if(marker){ 
             marker.setPosition(location); 
         }else
         {
-            marker = new google.maps.Marker({ 
-                position: location, 
-                map: map
-            });
+            
+            if(eventtype != 'dragevent') {
+                marker = new google.maps.Marker({ 
+                    position: location, 
+                    map: map
+                });
+            } 
         }
         //document.getElementById('lat').value=location.lat();
         //document.getElementById('lng').value=location.lng();
@@ -369,13 +372,15 @@
         if(tag == 1 )
          google.maps.event.trigger(markers[i], "click");
 
+         var participant_track= ""; 
+             setCookie("ParticipantTrack",participant_track, '');
+            
          var bounds = new google.maps.LatLngBounds();
         
          bounds.extend(markers[i].position);
          map.fitBounds(bounds);
 
          map.setCenter(markers[i].getPosition());
-
          //if(reloadzoomlvl==1)
           //map.setZoom(17);
          
@@ -512,7 +517,7 @@ function saveMapState()
     var cookiestring=mapLat+"_"+mapLng+"_"+mapZoom; 
     setCookie("myMapCookie",cookiestring, 30); 
      
-     placeMarker(mapCentre); 
+     placeMarker(mapCentre,'dragevent'); 
 } 
 
 function loadMapState() 

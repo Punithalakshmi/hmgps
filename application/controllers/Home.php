@@ -215,7 +215,8 @@ class Home extends CI_Controller {
 						 		$str .='<li><a href="mailto:?subject=Here\'s MyGPS&body=Hi, '.site_url('search/'.$channel_id).'"><img src="'.base_url().'assets/image/email_send.png" target="_blank" alt="email" /></a></li>';
                              if($this->data['user_info']['channel_id'] == $channel_id) {
                                     $str .='<li><a onclick="invisible_participant('.$val->user->profile->id.','.$groups['id'].')"><img src="'.base_url().'assets/image/invisible_participant_icon.png" target="_blank" alt="Invisible Participant" /></a></li>';
-                                }   
+                                } 
+                              $str .='<li><input type="checkbox" value="track" class="track_user" data-chid="'.$channel_id.'" />Track User</li>';  
 							$str .= '</ul>
 
 							</div>';

@@ -1786,3 +1786,39 @@ span.popover-br { right: 2px; bottom: 12px; }
 #google_image_div{ width:150px !important;}
 
 #google_image_div img.img_ad {width: 100% !important;}
+
+.p-parti {
+    float: left;
+    width: 50%;
+}
+
+
+.p-find-iocn {
+    float: right;
+    margin-top: 6px;
+    width: 50%;
+}
+
+#participants-list > li {
+    border-bottom: 1px solid #ddd;
+    clear: both;
+}
+
+#participants-list .name {
+    display: block;
+    text-align: left;
+  float:none;
+}
+
+body #participants-list .map-list-label .name {
+    float: left;
+}
+
+#participants-list span:last-child {
+    color: #3f3f3f;
+
+}
+
+#participants-list .sprite-image{margin: 0 0 3px;}
+
+#participants-list{min-width: 220px;}
