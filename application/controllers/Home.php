@@ -215,7 +215,9 @@ class Home extends CI_Controller {
                              if($this->data['user_info']['channel_id'] == $channel_id) {
                                     $str .='<li><a onclick="invisible_participant('.$val->user->profile->id.','.$groups['id'].')"><img src="'.base_url().'assets/image/invisible_participant_icon.png" target="_blank" alt="Invisible Participant" /></a></li>';
                                 } 
-                              $str .='<li><input type="checkbox" value="track" class="track_userr" data-chid="'.$channel_id.'" data-mapsearch="'.get_cookie('map_search').'" data-uid="'.get_cookie('map_user_id').'" onclick="trackuser();" />Track User</li>';  
+                              $tracked_user = get_cookie("trackeduser");  
+                              $checked = (($tracked_user == $channel_id)|| ($tracked_user == $displayname))?'checked="checked"':"";
+                              $str .='<li><input type="checkbox" value="track" '.$checked.' class="track_userr" data-chid="'.$channel_id.'" data-mapsearch="'.get_cookie('map_search').'" data-uid="'.get_cookie('map_user_id').'" onclick="trackuser();" />Track User</li>';  
 							$str .= '</ul>
 
 							</div>';

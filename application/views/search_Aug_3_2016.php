@@ -111,16 +111,16 @@
           maxWidth: 250
         });
     window.localStorage.removeItem('mapzoom');
-    
-    
+   
     var trackingUser    = tracker_details("trackinguser");
     var trackedUser     = tracker_details("trackeduser");
     var splitStr        = get_user_changed_position("myMapCookie"); 
     var trackedStr      = get_user_changed_position("trackedUser_position");
-
     
+  
     map_search(locations,contents,user_id,1);  
 
+    
     function map_search(locations,contents,user_id,stable){
 
         for (var i = 0; i < markers.length; i++) {
@@ -144,14 +144,10 @@
             },120000);
         }  
 
-        
-        
-        //var gotCookieString = getCookie("myMapCookie"); 
-        //var splitStr        = gotCookieString.split("_");
          savedMapLat        = (trackedStr!='')?parseFloat(trackedStr[0]):parseFloat(splitStr[0]);
          savedMapLng        = (trackedStr!='')?parseFloat(trackedStr[1]):parseFloat(splitStr[1]);
          savedMapZoom       = (trackedStr!='')?parseFloat(trackedStr[2]):parseFloat(splitStr[2]);
-         
+
         var centerlat = "";
         var centerlon = "";
         var zoomlvl   = "";
@@ -300,7 +296,7 @@
             partcipanthead += '<li class="text-center map-admin">Administrator : '+locations[i][0].substring(0,10)+'</li>';
 
             //centger on current position
-            if(splitStr == '' && trackedStr ==''){
+            if(splitStr == ''){
                 posclick(sel_group_id);
             }
           }
@@ -320,11 +316,11 @@
                 highlight_classname = 'sprite-image'; 
              }
              
-            filters += '<li><a href="javascript:posclick('+ i + ')"><div class="p-parti"><span class="name"><b>DN: </b> '+gpus+'</span><span class="name"><b>CHID: </b>'+ctrack+'</span></div></a><div class="p-find-iocn">'+group_admin_icon+'<a href="javascript:posclick('+ i + ')" class="myposition '+highlight_classname+'">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
+            filters += '<li><a href="javascript:posclick('+ i + ')"> <div class="p-parti"><span class="name"><b>DN: </b> '+gpus+'</span><span class="name"><b>CHID: </b>'+ctrack+'</span></div></a><div class="p-find-iocn">'+group_admin_icon+'<a href="javascript:posclick('+ i + ')" class="myposition '+highlight_classname+'">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
           }
           
           if(invisible == 1) { 
-            filters1 += '<li><a href="javascript:posclick('+ i + ')"><div class="p-parti"><span class="name"><b>DN: </b>'+gpus+'</span><span class="name"><b>CHID: </b>'+ctrack+'</span></div></a><div class="p-find-iocn">'+group_admin_icon+invisible_icon+'</div></li>';
+            filters1 += '<li><a href="javascript:posclick('+ i + ')"><div class="p-parti"><span class="name"><b>DN: </b>'+gpus+'</span><span class="name"><b>CHID: </b> '+ctrack+'</span></div></a><div class="p-find-iocn">'+group_admin_icon+invisible_icon+'</div></li>';
           }
 
         }
@@ -417,6 +413,7 @@
     function closeinfowindow(){
         infowindow.close();
         setTimeout(function(){ map.setZoom(16); },2000);
+        
        
     }
     
@@ -534,10 +531,9 @@ function saveMapState()
     setCookie("myMapCookie",cookiestring, 30); 
     
     var trackedUser_zoom_update = get_user_changed_position("trackedUser_position");
-   if(trackedUser_zoom_update!='') {
-        var cookie_zoom = trackedUser_zoom_update[0]+"_"+trackedUser_zoom_update[1]+"_"+mapZoom;
-        setCookie("trackedUser_position",cookie_zoom, 30);
-    }
+    var cookie_zoom = trackedUser_zoom_update[0]+"_"+trackedUser_zoom_update[1]+"_"+mapZoom;
+    setCookie("trackedUser_position",cookie_zoom, 30);
+     
     placeMarker(mapCentre,'dragevent'); 
 } 
 
@@ -620,14 +616,12 @@ function trackuser()
 
 function get_user_changed_position(cookie_name) {
     var trackeduserpos  = getCookie(cookie_name);
-    var posstr = trackeduserpos.split("_");
-    return posstr;
+    return trackeduserpos.split("_");
 }
 
 function tracker_details(cookie_name) {
     var trackdet  = getCookie(cookie_name);
     return trackdet;
 }
-
 
 </script>

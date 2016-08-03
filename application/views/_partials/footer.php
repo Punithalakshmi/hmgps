@@ -92,5 +92,16 @@
 <!-- Include all compiled plugins (below), or include individual files as needed --> 
 <script src="<?php echo base_url();?>assets/js/bootstrap.js"></script>
 <script src="<?php echo base_url();?>assets/js/function.js"></script>
+<script>
+$(window).load(function() {
+    
+    if(splitStr == '' && trackedStr == '') {
+   // setTimeout(function(){
+        myclick(sel_group_id,1); 
+    //    },1000);
+    setTimeout(function(){ closeinfowindow(); },3000);
+    }
+});
+</script>
 </body>
 </html>

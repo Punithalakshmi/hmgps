@@ -1798,18 +1798,18 @@ span.popover-br { right: 2px; bottom: 12px; }
 
 .p-parti {
     float: left;
-    width: 50%;
+    width:50%;
 }
 
 
 .p-find-iocn {
     float: right;
     margin-top: 6px;
-    width: 50%;
+    width:48%;
 }
 
 #participants-list > li {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #222;
     clear: both;
 }
 
@@ -1831,3 +1831,16 @@ body #participants-list .map-list-label .name {
 #participants-list .sprite-image{margin: 0 4px 3px;}
 
 #participants-list{min-width: 250px;}
+
+#participants-list .name > b {
+    float: left;
+    min-width: 48px;
+    
+}
+
+.quick-shar{height: 23px; cursor: pointer;}
+
+#participants-list > li > a {
+    padding: 0;
+}
+

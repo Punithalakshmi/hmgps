@@ -26,6 +26,7 @@
  <link rel="icon" href="<?php echo site_url();?>assets/image/fevicon.ico" type="image/gif" sizes="16x16"> 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
 <script src="<?php echo base_url();?>assets/js/jquery-1.10.2.js"></script> 
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
 
 <script src="<?php echo base_url();?>assets/js/social-buttons-share.js"></script>
 
