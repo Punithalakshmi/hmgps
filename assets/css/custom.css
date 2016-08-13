@@ -1843,4 +1843,13 @@ body #participants-list .map-list-label .name {
 #participants-list > li > a {
     padding: 0;
 }
+span.staticmap {
+    color: #FFF;
+    FONT-WEIGHT: BOLD;
+    Z-INDEX: 1000;
+    POSITION: ABSOLUTE;
+    RIGHT: 0;
+    BACKGROUND: RED;
+    PADDING: 5PX;
+}
 

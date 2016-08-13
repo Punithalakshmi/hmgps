@@ -30,7 +30,7 @@
 
 <script src="<?php echo base_url();?>assets/js/social-buttons-share.js"></script>
 
-<script src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true"></script>
 <script src="<?php echo base_url();?>assets/js/infobox.js"></script>
 <script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 

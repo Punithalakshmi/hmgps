@@ -5,7 +5,7 @@ class Home extends CI_Controller {
 
 	private $data = array('map_search_key'=>'','service_resp'=>array('status'=>''));
 
-	protected $api_url = 'http://heresmygps.com/service/';
+	protected $api_url = 'http://localhost/hmgps_app/service/';
 	protected $service_param = array('X-APP-KEY'=>'myGPs~@!');
 
 	function __construct()
@@ -124,11 +124,12 @@ class Home extends CI_Controller {
 	   			$service_status['message'] = $map_det['msg'];
 
 	   		$this->data['service_resp'] = $service_status;
-          
+
+
 	   		if(isset($map_det['status']) && $map_det['status']=='success' && isset($map_det['members']) && !empty($map_det['members'])){
-               
+
 	   			foreach($map_det['members'] as $val){
-                   
+
 	   				if($val->user->profile->flag==0)
 	   					continue;
 
@@ -156,10 +157,8 @@ class Home extends CI_Controller {
 	   			
                     $group_invisible = $val->user->group->invisible;	
 	
-	   				$locations[]      = array($displayname,$val->user->position->lat,$val->user->position->lon,$lastup,$val->user->profile->user_type,$channel_id,$group_invisible,'');
-                    $static_maps[]    = (array)$val->user->static_map->maps;
-                    $st_map_user_id[] = $val->user->static_map->user_id;
-                    
+	   				$locations[] = array($displayname,$val->user->position->lat,$val->user->position->lon,$lastup,$val->user->profile->user_type,$channel_id,$group_invisible);
+	   			
 	   				$img = base_url().'assets/image/default-user.png';
 
 	   				if($val->user->profile->profile_image !='' && file_exists($val->user->profile->profile_image))
@@ -169,7 +168,7 @@ class Home extends CI_Controller {
 
                     $groups = $this->db->query("select * from groups where join_key='".$joinkey."'")->row_array();
                     
-	   				$str    = '<div id="seach_content">
+	   				$str  = '<div id="seach_content">
 	   					       <span data-role="close" onclick="closeinfowindow()">X</span>
 				             <div class="user_info">
 							<div class="user">
@@ -240,44 +239,11 @@ class Home extends CI_Controller {
             $service_status = array('status'=>'error','message'=>$e->getMessage());
             $this->data['service_resp'] = $service_status;
         } 
-
-        $stat_maps = array();
-        foreach($static_maps as $skey => $svalue){ 
-          for($j = 0; $j<count($svalue); $j++) {
-            $gp = $this->db->query("select * from groups where id='".$svalue[$j]->group_id."'")->row_array();
-            $ur = $this->db->query("select * from user where id='".$st_map_user_id[$j]."'")->row_array();
-            $locations[] = array($svalue[$j]->map_name,$svalue[$j]->lat,$svalue[$j]->lon,'','',$gp['join_key'],'','staticmap');
-            $stmp_str  = '<div id="seach_content" style="width:200px !important;">
-	   					       <span class="staticmap" onclick="closeinfowindow(1)">REMOVE</span>
-            			     	<div class="user_info">
-        							<div class="user">
-        								<img src="'.$stat_maps[$j]['clue_image'].'" width="100" height="100" alt="user-image" />
-        							</div>
-    							</div>
-                                <hr />
-                                <div>
-                                    Created By '.$ur['display_name'].'
-                                </div>
-    							<hr />
-    							<div class="time_content">
-    								<h5>GPS Coordinate <img src="'.base_url().'assets/image/searchatlas-256.png" alt="seach-gps" /></h5>
-    							    <p>'.$svalue[$j]->lat.' , '.$svalue[$j]->lon.'</p>
-    							</div>
-                                <hr />
-                                <ul class="contact_card">
-                                    <li><a href="tel:'.$ur["phonenumber"].'"><img src="'.base_url().'assets/image/phone.png" alt="phone"/>'.$ur["phonenumber"].'</a></li>
-                                    <li><a href="sms:'.$ur["phonenumber"].'&body=Here\'s MyGPS" class="sms"><img src="'.base_url().'assets/image/sms.png" alt="sms" /></a></li>
-                                    <li><a href="mailto:?subject=Here\'s MyGPS&body=Hi, '.site_url('search/'.$gp["join_key"]).'"><img src="'.base_url().'assets/image/email_send.png" target="_blank" alt="email" /></a></li>
-                                </ul>
-                            </div>';
-                            
-             $contents[]      =   array($stmp_str,'') ;             
-          }      
-        }
-    
-	   	$this->data['user_id']    = $user_id;	
-   		$this->data['locations']  = json_encode($locations,JSON_PRETTY_PRINT);
-   		$this->data['contents']   = json_encode($contents);
+        
+       
+	   	$this->data['user_id'] = $user_id;	
+   		$this->data['locations'] =  json_encode($locations,JSON_PRETTY_PRINT);
+   		$this->data['contents'] = json_encode($contents);
 
    		//ajax request rsponse
    		if($ajax==1){

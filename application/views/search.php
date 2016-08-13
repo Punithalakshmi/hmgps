@@ -93,10 +93,12 @@
       $('#header_toggle').hide();
 
      // Define your locations: HTML content for the info window, latitude, longitude
-    var locations = <?php echo $locations;?>;
+    var locations       = <?php echo $locations;?>;
 
-    var contents = <?php echo $contents;?>;
-
+    var contents        = <?php echo $contents;?>;
+    
+    //var staticmaps      = <?php //echo $static_maps; ?>;
+    
     var user_id = '<?php echo $user_id;?>';
     
     var sel_group_id = false;
@@ -237,7 +239,7 @@
 
         var colors = ['F08080','C6EF8C'];
         
-         var filters = '',filters1 ='', groupname = '', infoindexx = '', partcipanthead = '';
+         var filters = '',filters1 ='', groupname = '', infoindexx = '', partcipanthead = '', clues = '', staticmap = '', markericon='';
         
          groupname = '<?php echo $this->uri->segment(2);?>';
           
@@ -259,9 +261,17 @@
         }
 
         for (var i = 0; i < locations.length; i++) {  
-
-          var dat = new Date((contents[i][1]*1000));
-
+           staticmap = locations[i][7];
+          var dat    = new Date((contents[i][1]*1000));
+          
+          if(staticmap != 'staticmap'){
+            markericon = site_url+'/mapicon/index/'+locations[i][0]+'/'+locations[i][3]+'/'+locations[i][4];
+          }
+          else
+          {
+            markericon = '';
+          }
+          
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i][1], locations[i][2]),
             map: map,
@@ -269,7 +279,7 @@
             title: locations[i][0]+'\nUpdated : '+formattime(dat),
             optimized: false,
             draggable:true,
-            icon:site_url+'/mapicon/index/'+locations[i][0]+'/'+locations[i][3]+'/'+locations[i][4]
+            icon:markericon
             
           });
           markers.push(marker);
@@ -291,7 +301,9 @@
 
           groupname  = groupname.toLowerCase();
           var locat  = locations[i][5].toLowerCase();
-          if(groupname == locat) {
+          
+          
+          if(groupname == locat && staticmap == '') {
             
             sel_group_id = i;
 
@@ -306,10 +318,12 @@
           }
             invisible_icon = '<span class="invisible_icon">&nbsp;</span>';
             
-          var invisible = locations[i][6];
-             var gpus   = locations[i][0].substring(0,13);
-             var ctrack = locations[i][5].substring(0,13);
-          if(invisible == 0) { 
+             var invisible = locations[i][6];
+             var gpus      = locations[i][0].substring(0,13);
+             var ctrack    = locations[i][5].substring(0,13);
+             
+             
+          if(invisible == 0 && staticmap == '') { 
              
              var highlight_classname = '';
              if((user_id == trackingUser) && (gpus == trackedUser || ctrack == trackedUser) ){
@@ -323,10 +337,15 @@
             filters += '<li><a href="javascript:posclick('+ i + ')"><div class="p-parti"><span class="name"><b>DN: </b> '+gpus+'</span><span class="name"><b>CHID: </b>'+ctrack+'</span></div></a><div class="p-find-iocn">'+group_admin_icon+'<a href="javascript:posclick('+ i + ')" class="myposition '+highlight_classname+'">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
           }
           
-          if(invisible == 1) { 
+          if(invisible == 1 && staticmap == '') { 
             filters1 += '<li><a href="javascript:posclick('+ i + ')"><div class="p-parti"><span class="name"><b>DN: </b>'+gpus+'</span><span class="name"><b>CHID: </b>'+ctrack+'</span></div></a><div class="p-find-iocn">'+group_admin_icon+invisible_icon+'</div></li>';
           }
-
+          
+          //clues integration by punitha
+          if(invisible =='' && staticmap == 'staticmap') {
+            clues += '<li><a href="javascript:posclick('+ i + ')"><div class="p-parti"><span class="name"><b>DN: </b> '+gpus+'</span><span class="name"><b>CHID: </b>'+ctrack+'</span></div></a><div class="p-find-iocn"><a href="javascript:posclick('+ i + ')" class="myposition sprite-image">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
+          }
+          
         }
         
         google.maps.event.addListener(map, "dblclick", function(event) {
@@ -340,11 +359,19 @@
         if(filters1){
           filters += '<li class="text-center invisible-head">Invisible Participants</li>';
           filters += filters1;
-        }  
+        } 
+        
+        //added clues header 
+        if(clues){
+            filters  += '<li class="text-center invisible-head">Static Maps/Clues</li>'
+            filters += clues;
+        }
+       
         document.getElementById("participants-list").innerHTML = partcipanthead + filters;
-
+      
     }
     
+   
     var marker;    
     function placeMarker(location,eventtype = '') {
        
@@ -352,7 +379,7 @@
             marker.setPosition(location); 
         }else
         {
-            
+           
             if(eventtype != 'dragevent') {
                 marker = new google.maps.Marker({ 
                     position: location, 
@@ -360,8 +387,6 @@
                 });
             } 
         }
-        //document.getElementById('lat').value=location.lat();
-        //document.getElementById('lng').value=location.lng();
         getAddress(location);
     }
 
@@ -392,7 +417,7 @@
         
          bounds.extend(markers[i].position);
          map.fitBounds(bounds);
-
+         
          map.setCenter(markers[i].getPosition());
          //if(reloadzoomlvl==1)
           //map.setZoom(17);
@@ -402,7 +427,6 @@
     function posclick(i) 
     {
          var bounds = new google.maps.LatLngBounds();
-         
          bounds.extend(markers[i].position);
          map.fitBounds(bounds);
          map.setCenter(markers[i].getPosition());
@@ -414,10 +438,11 @@
     }
 
 
-    function closeinfowindow(){
+    function closeinfowindow(closeid){
         infowindow.close();
-        setTimeout(function(){ map.setZoom(16); },2000);
-       
+        if(closeid != 1){
+           setTimeout(function(){ map.setZoom(16); },2000);
+        }
     }
     
  
@@ -425,8 +450,7 @@
 
       var $scocial = $(this).parents("#sharethis").find('.vertical');
 
-        if( $scocial.length )
-        {
+        if($scocial.length){
           $scocial.remove();
         }
         else
@@ -580,11 +604,19 @@ function getCookie(c_name) {
 
 function trackuser()
 {
+    
+    var already_tracked = tracker_details("trackeduser");
+    
        if(!$(".track_userr").is(":checked")){
-         document.cookie="trackeduser=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
-         document.cookie="trackinguser=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
-         document.cookie="trackmapID=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
-         document.cookie="trackedUser_position=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+         if(confirm("You want untrack this member "+already_tracked)) {
+             alert("You are untracked this member "+already_tracked);
+             
+             document.cookie="trackeduser=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+             document.cookie="trackinguser=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+             document.cookie="trackmapID=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+             document.cookie="trackedUser_position=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+             return true;
+         }
        }
        else
        {
@@ -606,14 +638,19 @@ function trackuser()
                   setCookie("trackedUser_position",cookiestring, 30);
                       
                   if(uid == al_uid) {
-                    setCookie("trackeduser",cid,2);
+                    if(confirm("You want untrack this member "+tracker_details("trackeduser"))) {
+                      setCookie("trackeduser",cid,2);
+                    }
                   }
                   else
                   {
                      setCookie("trackeduser",cid,2);
                      setCookie("trackinguser",uid,2);
                      setCookie("trackmapID",sid,2);
+                     alert("You are tracked this member "+cid);
+                     return true; 
                   }
+                 
            });
     } 
 }
