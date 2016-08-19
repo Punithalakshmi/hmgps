@@ -240,7 +240,8 @@ class Home extends CI_Controller {
             $service_status = array('status'=>'error','message'=>$e->getMessage());
             $this->data['service_resp'] = $service_status;
         } 
-
+       	$this->data['participant_count']    = count($locations);
+            
         $stat_maps = array();
         foreach($static_maps as $skey => $svalue){ 
           for($j = 0; $j<count($svalue); $j++) {
@@ -248,7 +249,7 @@ class Home extends CI_Controller {
             $ur = $this->db->query("select * from user where id='".$st_map_user_id[$j]."'")->row_array();
             $locations[] = array($svalue[$j]->map_name,$svalue[$j]->lat,$svalue[$j]->lon,'','',$gp['join_key'],'','staticmap');
             $stmp_str  = '<div id="seach_content" style="width:200px !important;">
-	   					       <span class="staticmap" onclick="closeinfowindow(1)">REMOVE</span>
+	   					       <span class="staticmap" onclick="closeinfowindow(1)">CLOSE</span>
             			     	<div class="user_info">
         							<div class="user">
         								<img src="'.$stat_maps[$j]['clue_image'].'" width="100" height="100" alt="user-image" />

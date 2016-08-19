@@ -97,6 +97,8 @@
 
     var contents        = <?php echo $contents;?>;
     
+    var participant_ct  = <?php echo $participant_count ?>;
+    
     //var staticmaps      = <?php //echo $static_maps; ?>;
     
     var user_id = '<?php echo $user_id;?>';
@@ -105,7 +107,7 @@
 
     var markers = new Array();
 
-    var map = '',geocoder = '', savedMapLat='', savedMapLng='', savedMapZoom='';
+    var map = '',geocoder = '', savedMapLat='', savedMapLng='', savedMapZoom='',mapResized = false;
 
     var reloadzoomlvl = '';
 
@@ -132,7 +134,7 @@
         markers = new Array();
 
 
-        $("#count-participants").html(locations.length);
+        $("#count-participants").html(participant_ct);
 
         reloadzoomlvl = window.localStorage.getItem('mapzoom');
 
@@ -352,6 +354,11 @@
                placeMarker(event.latLng,'dbclick'); 
         });
         
+       google.maps.event.addDomListener(window, 'resize', function() {
+            var center = map.getCenter()
+            google.maps.event.trigger(map, "resize")
+            map.setCenter(center)
+        })
         
         // as a suggestion you could use the event listener to save the state when zoom changes or drag ends
         google.maps.event.addListener(map, 'tilesloaded', tilesLoaded);    
