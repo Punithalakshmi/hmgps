@@ -1054,6 +1054,7 @@ body .hmobile-header .channel-area, .mobile-header .guest_register{width: auto !
 
 
 @media only screen and (max-width: 767px){  
+   
 footer .footer-links{ padding-left:0;}
 .logo, .top-search, .top-map, .right-cont, .top-img{ text-align:center;}
 .logo p, .top-search, .top-map, .top-menu{ margin-top:13px;}
@@ -1246,6 +1247,8 @@ body .mobile-header .search-area div input {
 .hmgps-content-area h4 {font-size: 16px;line-height: 24px;}
 .content-text img {padding: 0 15px;}
 .content-text .view-map{padding:0px 10px;}
+
+
 }
 /*mobile css*/
 
@@ -1466,7 +1469,7 @@ body .mobile-header .search-area div input {
 .mobile-header .mobile-search {margin: 0 auto;padding: 5px 0 0;width: 81%;}
 .mobile-header .nav > li > a > img{ margin-left:0;margin-top: 5px;}
 #map .gm-style > div > div { top:0px !important;}
-#map .gm-style > div > div > div  { top:90px !important;}
+/*#map .gm-style > div > div > div  { top:90px !important;}*/
 /*D*/
 .m-search { margin: 0 auto; width: 85%;}
 .mobile-header .mobile-search{width:81%; float: left; margin-bottom:5px;}
@@ -1545,7 +1548,7 @@ span.m-manully {display: block;}
 	.mobile-login .m-unsecured{width:54%;padding-left:4%;}
 	.top-menu .nav.navbar-nav {background-color: transparent;position: relative;left: -19px;}
     #map .gm-style > div > div { top:0px !important;}
-#map .gm-style > div > div > div  { top:90px !important;}
+/*#map .gm-style > div > div > div  { top:90px !important;}*/
 	.mobile-header .top-nav.navi-mobile {float: right; margin-left: 15px; width: 10%;}
 	.mobile-header .top-nav{width: 13% !important;}
 	.mobile-header .share-icon {float: left;margin-left: 0;margin-right: 0;width: 26px;}
@@ -1609,15 +1612,18 @@ input#phone,input#display_name {
 
 	.top-menu .nav.navbar-nav {background-color: transparent;position: relative;left: -19px;}
     #map .gm-style > div > div { top:0px !important;}
-#map .gm-style > div > div > div { top:90px !important;}
+/*#map .gm-style > div > div > div { top:90px !important;}*/
 .mobile-header .chn-id a{ margin-right:7px;}
 
 }
 
 
+
+
+
 @media screen and (min-width:320px) and (max-width:1024px){
     #map .gm-style > div > div { top:0px !important;}
-    #map .gm-style > div > div > div { top:90px !important;}
+   /* #map .gm-style > div > div > div { top:90px !important;}*/
 	footer {display: none;}
     }
     
@@ -1672,7 +1678,7 @@ input#phone,input#display_name {
     display:inline-block !important;
     width:25px !important; 
     height:25px !important; 
-    background:url("../image/highlight.png") no-repeat !important;
+    background:url("../image/track_icon.jpg") no-repeat !important;
     background-size: cover;
     padding: 0 !important;
     border:1px solid transparent;
@@ -1853,3 +1859,168 @@ span.staticmap {
     PADDING: 5PX;
 }
 
+/*  Timer CSS */
+
+
+.timer-btn h2 + button,
+.timer-btn h2 + button:hover {  background-color:transparent !important; border-color:transparent !important; border-radius:0; margin-right:10px; }
+
+.timer-btn h2 { 
+  border:1px solid transparent; display: inline-block; float:left;  margin-top:5px; 
+   padding:2px 5px; 
+  font-size:20px;
+  color:#000;
+
+}
+
+.timer-btn h2::after{content: 'Refresh every 2 minutes';
+    font-size: 10px;
+    position: absolute;
+    bottom: -4px;
+    right: 146px;
+    font-weight: normal;
+    white-space: nowrap;}
+
+#geolocationBtn { max-width:30px }
+#geolocationBtn {
+    right: -10% !important;
+    top: 10% !important;
+}
+
+
+
+
+@media (max-width:767px) {
+  .timer-btn h2 + button {  position: absolute !important; right:-10px; top:40px; }
+ body #map .gm-style-mtc div:nth-child(2) {
+    top: 128px !important;
+}
+
+#geolocationBtn {
+    right: -141px !important;}
+    
+    .mobile-header .mobile-search #adv-search {margin-bottom: 5px !important;}
+  
+}
+@media (min-width:380px) and (max-width:767px) {
+  .timer-btn h2 + button {  position: absolute !important; right:-10px; top:40px; }
+  
+  .timer-btn h2 { position: absolute !important; right:44px; top:40px;  }
+  
+  .timer-btn h2::after {right: -39px; bottom: -14px;}
+  .timer-btn h2{right: 180px;top: -4px;}
+  .timer-btn h2 + button {right: 128px; top: -4px;}
+  
+}
+@media (min-width:0px) and (max-width:379px) {
+.timer-btn h2::after{right: -38px;bottom: -15px;}
+.timer-btn h2 { position: absolute !important; right:125px; top:1px;  }
+.timer-btn h2 + button{top: -1px;right: 84px;}
+.parti{font-size:11px; padding:5px;}
+}
+
+@media (max-width:1024px) {
+	
+	
+	body #map .gm-style [title="Rotate map 90 degrees"] {
+    top: 137px !important;
+}
+
+body #map .gm-style .gm-tilt {
+    top: 191px !important;
+} 
+ 
+
+ body #map .gm-style .gm-svpc {
+    top: 81px !important;
+}
+	
+	
+	}
+    
+    
+    @media screen and (max-width:375px){
+    
+  .pass-sec {margin-left: 47px !important;   
+  }
+
+}
+
+
+.btn-participant .btn-group.open .dropdown-toggle{-webkit-box-shadow: inherit!important;box-shadow: inherit!important;}
+.contact_card li input { display:inline-block; width:inherit; margin-right:3px;}
+
+
+.pass_protect{
+    display: block;
+    position: absolute !important;
+    left: -49px;
+    background: transparent !important;
+    top: -2px;
+    border: 0;
+    float: left !important;
+}
+
+.pass_protect:hover{
+    background: transparent !important;
+}
+
+
+.pass-sec {
+      margin-left: 72px;
+    margin-top: 7px;
+    width: 77%;
+    height: 32px !important;
+}
+
+.display_popup {
+    background: url('../image/send-to-front-button.svg') no-repeat center;
+        background-size: auto auto;
+    display: inline-block;
+    width: 25px;
+    height: 23px;
+    position: absolute;
+    margin-left: -25px;
+    background-size: 18px;
+}
+.display_popup:hover {
+    opacity: .6;
+}
+.display_popup {cursor: pointer;}
+input[type="radio"], input[type="checkbox"]{width: 14px!important;}
+.manual-address input[type="text"] {
+    min-width: 205px;
+}
+.popover{z-index: 1024;}
+
+.manual-address .text-center b {
+    margin-bottom: 5px;
+    display: block;
+    margin-top: 10px;
+}
+.manual-address .input-group .form-control {
+    width: 35px;
+}
+.manual-address .input-group-addon.white-bg {
+    min-width: 187px;
+}
+.manual-address #custom_phonenumber, .manual-address #custom_display_name {
+    min-width: 222px;
+}
+
+[data-role="close"]{bottom:0 !important; top:auto !important; width:70px !important;}
+
+.add-map {
+    height: 456px;
+    position: absolute;
+    right: 0;
+    top: 110px;
+    width: 156px;
+    z-index: 999999;
+}
+
+.participant{
+    position:relative;
+}
+
+.gm-style-iw [data-role="close"] { border-radius:3px !important;}

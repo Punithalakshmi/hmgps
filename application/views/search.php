@@ -29,36 +29,43 @@
 
 <script src="<?php echo base_url();?>assets/js/geolocationmarker-compiled.js"></script>
 <script src="<?php echo base_url();?>assets/js/show_position.js"></script>
-
-<div class="google-add right-add02">
-        <!-- Google ads -->
-        
-        <ins class="adsbygoogle"
-             style="display:block;"
-             data-ad-client="ca-pub-3938942410095568"
-             data-ad-slot="1328814540"
-             data-ad-format="horizontal">
-        </ins>
-        
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-        
-    </div>
-    <style type="text/css">
-.google-add.right-add02 {
-    margin: auto;
-    text-align: center;
-}
-    </style>
     
 <div class="container-fluid search"><!-- Content area Start-->
       <div class="row participant">
           <div id="latlang" style=""></div>
+          <!-- <div class="add-map">
+            <div class="google-add right-add02">
+             Google ads 
+            
+            <ins class="adsbygoogle"
+                 style="display:block;"
+                 data-ad-client="ca-pub-3938942410095568"
+                 data-ad-slot="1328814540"
+                 data-ad-format="vertical">
+            </ins>
+            
+            <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        
+         </div>
+          </div>-->
+          
       		<div id="map" style="width:100%; height: 600px;"></div>
-
-          <div class="btn-group btn-participant">
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+             <div class="btn-group btn-participant timer-btn"  >
+			
+				<h2 id="re-load"><time>00:00</time></h2>
+			
+				<button title="Refresh" type="button" class="btn btn-warning dropdown-toggle refresh-clk" >
+				 <img src ="<?php echo base_url();?>assets/image/imgpsh_fullsize.png" width="25px" height="25px">
+				</button>
+			
+			<button style="display:none;" id="start">start</button>
+			<button style="display:none;" id="stop">stop</button>
+			<button style="display:none;" id="clear">clear</button>
+			
+			
+            <button type="button" class="btn btn-warning dropdown-toggle parti" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Participants(<span id="count-participants">0</span>) <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" id="participants-list">
@@ -86,58 +93,89 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+    <style type="text/css">
+.google-add.right-add02 {
+    margin: auto;
+    text-align: center;
+}
+/**
+ * div#map {
+ *     height: 83vh!Important;
+ * }
+ */
+    </style>
 <script>
 
- 
+    //$(document).on("pagecreate",function(event){
+         // $(window).on("orientationchange",function(event){
+//            var orientat = event.orientation;
+//          });                     
+   // });
+
     if($('div[id="header_toggle"]').text())
       $('#header_toggle').hide();
 
      // Define your locations: HTML content for the info window, latitude, longitude
-    var locations       = <?php echo $locations;?>;
-
-    var contents        = <?php echo $contents;?>;
+    var locations         = <?php echo $locations;?>;
+    var contents          = <?php echo $contents;?>;
+    var participant_ct    = <?php echo $participant_count ?>;       
+    var mheader           = '<?php echo $mobile_header; ?>'; 
+    var breaduser         = '<?php echo $breadcrumb_user;?>';
+    var breadtimelimit    = '<?php echo $breadcrumb_timelimit;?>';
+    var breadcrumb_status = '<?php echo $breadcrumb_status;?>';
     
-    var participant_ct  = <?php echo $participant_count ?>;
+    var maptype  = '<?php echo $type; ?>';
+    var maplt    = '<?php echo $lat; ?>';
+    var mapln    = '<?php echo $lon; ?>';
+    var maplctype= '<?php echo $location_type; ?>';
+    var join_key = '<?php echo $join_key; ?>';
+    var mapuptime= '<?php echo $dateupdate; ?>';
     
-    //var staticmaps      = <?php //echo $static_maps; ?>;
+   // alert(mheader);
     
     var user_id = '<?php echo $user_id;?>';
     
     var sel_group_id = false;
 
     var markers = new Array();
+    
+    var markercustomImages = new Array();
 
-    var map = '',geocoder = '', savedMapLat='', savedMapLng='', savedMapZoom='',mapResized = false;
+    var map = '',geocoder = '', savedMapLat='', savedMapLng='', savedMapZoom='', splitStr = '', pro_id='',utype = '',breadtimelt = '',breaduser='' ;
 
     var reloadzoomlvl = '';
+    var labeltext     = '';
 
     var infowindow = new google.maps.InfoWindow({
-          maxWidth: 250
+          maxWidth: 250 
         });
     window.localStorage.removeItem('mapzoom');
-    
     
     var trackingUser    = tracker_details("trackinguser");
     var trackedUser     = tracker_details("trackeduser");
     var splitStr        = get_user_changed_position("myMapCookie"); 
     var trackedStr      = get_user_changed_position("trackedUser_position");
-
+    
+    var stt = '';
     
     map_search(locations,contents,user_id,1);  
 
     function map_search(locations,contents,user_id,stable){
 
+         breadtimelt    = tracker_details("breadcrumb_timelimit");
+         breaduser      = tracker_details("breadcrumb_user");
+        
+         breadtimelimit = (breadtimelt!='' && breadtimelt != 'undefined')?breadtimelt:breadtimelimit;
+    
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(null);
         }
 
         markers = new Array();
 
-
         $("#count-participants").html(participant_ct);
 
         reloadzoomlvl = window.localStorage.getItem('mapzoom');
-
         
         if(serchval!=''){
 
@@ -148,8 +186,6 @@
             },120000);
         }  
 
-        
-        
         //var gotCookieString = getCookie("myMapCookie"); 
         //var splitStr        = gotCookieString.split("_");
          savedMapLat        = (trackedStr!='')?parseFloat(trackedStr[0]):parseFloat(splitStr[0]);
@@ -159,7 +195,7 @@
         var centerlat = "";
         var centerlon = "";
         var zoomlvl   = "";
-        
+      //  alert(locations[0][1]+""+locations[0][1]);
         if(splitStr!='' || trackedStr!=''){
             centerlat = (savedMapLat!=0)?savedMapLat:38.53;
             centerlon = (savedMapLng!=0)?savedMapLng:-101.42;
@@ -169,7 +205,7 @@
         {
             centerlat = (locations[0][1]!=0)?locations[0][1]:38.53;
             centerlon = (locations[0][2]!=0)?locations[0][2]:-101.42;
-            zoomlvl   = (locations[0][1]!=0)?20:3;
+            zoomlvl   = (locations[0][1]!=0)?9:3;
         }
         //if(locations.length > 0){
 //        	centerlat = (locations[0][1]!=0)?locations[0][1]:38.53;
@@ -183,17 +219,16 @@
         if(stable == 1){
 
         map = new google.maps.Map(document.getElementById('map'), {
-
-          zoom: zoomlvl,
+        zoom: zoomlvl,
+        gestureHandling: 'greedy',
           center: new google.maps.LatLng(centerlat, centerlon),
           mapTypeControl: true,
           mapTypeControlOptions: {
-                                    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+                                    style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
                                     mapTypeIds: [                                
                                       google.maps.MapTypeId.ROADMAP,
                                       google.maps.MapTypeId.SATELLITE,
                                       google.maps.MapTypeId.TERRAIN
-
                                     ]
                                   },
           streetViewControl: true,
@@ -205,7 +240,7 @@
             position: google.maps.ControlPosition.LEFT_TOP
           },
           scaleControl:true,
-          scrollwheel:true,
+          scrollwheel:false,
           panControl: true,
           panControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT
                               },
@@ -216,10 +251,17 @@
                                 position: google.maps.ControlPosition.LEFT_TOP
                               },
           heading: 90,
-          tilt: 45
+          tilt: 45,
+          fullscreenControl:true 
+         // gestureHandling: 'cooperative'
 
-          
         });
+        
+       // map.setOptions({'scrollwheel': false});
+        
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        //    map.setOptions({ 'draggable': false });
+        }
 
         var geoloccontrol = new klokantech.GeolocationControl(map, 15);
 
@@ -231,17 +273,10 @@
         google.maps.event.addListener(map, 'dragstart', function() {
           $("#geolocationIcon").css('background-position','0px center');
         }); 
-           
-        /*
-        var GeoMarker = new GeolocationMarker(map);
-        GeoMarker.setCircleOptions({fillColor: '#FFFFFF',visible:false,radius:5,clickable:true,editable:true});
-        */
         
         var iconCounter = 0;
-
-        var colors = ['F08080','C6EF8C'];
-        
-         var filters = '',filters1 ='', groupname = '', infoindexx = '', partcipanthead = '', clues = '', staticmap = '', markericon='';
+        var colors      = ['F08080','C6EF8C'];
+        var filters    = '',filters1 ='', groupname = '', infoindexx = '', partcipanthead = '', clues = '', staticmap = '', markericon='';
         
          groupname = '<?php echo $this->uri->segment(2);?>';
           
@@ -257,35 +292,63 @@
         // Add the markers and infowindows to the map
 
         if(locations.length > 0){
-
           filters += '<li class="map-list-label"><span class="name">Participant</span> <span>Find</span> <span>Status</span></li>';
-
         }
-
+        
+       if(maptype == 'public'){ 
+            var mdat    = new Date((mapuptime*1000));
+            var marker  = new google.maps.Marker({
+                position: new google.maps.LatLng(maplt, mapln),
+                map: map,
+                animation: google.maps.Animation.DROP,
+                title: join_key+'\nUpdated : '+formattime(mdat),
+                optimized: false,
+                label:join_key,
+                draggable:false,
+                icon: new google.maps.MarkerImage(site_url+'/assets/image/orange-icon.png')
+              });
+              markers.push(marker);
+        }  
+        
+        
         for (var i = 0; i < locations.length; i++) {  
            staticmap = locations[i][7];
           var dat    = new Date((contents[i][1]*1000));
-          
+          var tp     = locations[i][3];
           if(staticmap != 'staticmap'){
-            markericon = site_url+'/mapicon/index/'+locations[i][0]+'/'+locations[i][3]+'/'+locations[i][4];
+             
+               iconcustom = {
+                        url: locations[i][9], 
+                        scaledSize: new google.maps.Size(80, 40), 
+                        origin: new google.maps.Point(0,0), 
+                        anchor: new google.maps.Point(0,0),
+                        fillOpacity: 1,
+                        align: 'center',
+                        labelStyle: {zIndex:999999},
+                        fontSize:12
+                    };
+              var labeltext = {text:locations[i][0],color:"white"};      
           }
           else
           {
-            markericon = '';
+            iconcustom = '';
+            labeltext  = '';
           }
+          
           
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i][1], locations[i][2]),
             map: map,
             animation: google.maps.Animation.DROP,
+            label:labeltext,
             title: locations[i][0]+'\nUpdated : '+formattime(dat),
             optimized: false,
-            draggable:true,
-            icon:markericon
-            
+            draggable:false,
+            icon:iconcustom,
+            zIndex:9999+i
           });
           markers.push(marker);
-
+          
           if(locations[i][1] == 0 || locations[i][2] == 0)
             markers[i].setMap(null);
 
@@ -298,24 +361,33 @@
             }
           })(marker, i));
           
-            
+          var highlight_classname = '';  
           var group_admin_icon = "", invisible_icon = "";
 
           groupname  = groupname.toLowerCase();
           var locat  = locations[i][5].toLowerCase();
           
-          
           if(groupname == locat && staticmap == '') {
             
-            sel_group_id = i;
+               sel_group_id = i;
+             
+               pro_id = locations[i][8];
+               
+               utype  = locations[i][4];
+               highlight_classname = 'highlight'; 
+          
+               var asr = getCookie('map_search');
+               group_admin_icon= '<span class="group_admin sprite-image">&nbsp;</span>';
 
-            group_admin_icon= '<span class="group_admin sprite-image">&nbsp;</span>';
-
-            partcipanthead += '<li class="text-center map-admin">Administrator : '+locations[i][0].substring(0,10)+'</li>';
-
-            //centger on current position
+               partcipanthead += '<li class="text-center map-admin">Administrator : '+locations[i][0].substring(0,10)+'</li>';
+            
+            //center on current position
             if(splitStr == '' && trackedStr ==''){
                 posclick(sel_group_id);
+            }
+            
+            if(trackedStr =='') {
+              //trackuser(user_id,locations[i][5],asr,locations[i][1],locations[i][2],locations[i][8]);
             }
           }
             invisible_icon = '<span class="invisible_icon">&nbsp;</span>';
@@ -323,20 +395,16 @@
              var invisible = locations[i][6];
              var gpus      = locations[i][0].substring(0,13);
              var ctrack    = locations[i][5].substring(0,13);
-             
-             
-          if(invisible == 0 && staticmap == '') { 
-             
-             var highlight_classname = '';
-             if((user_id == trackingUser) && (gpus == trackedUser || ctrack == trackedUser) ){
-               highlight_classname = 'highlight'; 
+            
+          if(invisible == 0 && staticmap == '') {
+             if((gpus == trackedUser || ctrack == trackedUser) ){
+                 highlight_classname = 'highlight'; 
              }
              else
              {
                 highlight_classname = 'sprite-image'; 
              }
-             
-            filters += '<li><a href="javascript:posclick('+ i + ')"><div class="p-parti"><span class="name"><b>DN: </b> '+gpus+'</span><span class="name"><b>CHID: </b>'+ctrack+'</span></div></a><div class="p-find-iocn">'+group_admin_icon+'<a href="javascript:posclick('+ i + ')" class="myposition '+highlight_classname+'">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
+            filters += '<li><a href="javascript:posclick('+ i + ')"><div class="p-parti"><span class="name"><b>DN: </b> '+gpus+'</span><span class="name"><b>CHID: </b>'+ctrack+'</span></div></a><div class="p-find-iocn">'+group_admin_icon+'<a href="javascript:posclick('+ i + ')" id="'+locations[i][5]+'" class="myposition '+highlight_classname+'">&nbsp;</a><a href="javascript:myclick('+ i + ',1)" class="statuspop sprite-image">&nbsp;</a></div></li>';
           }
           
           if(invisible == 1 && staticmap == '') { 
@@ -349,16 +417,34 @@
           }
           
         }
-        
+        console.log(markercustomImages);
+        pro_id = (breaduser!='')?breaduser:pro_id;
+        //if(stt == 'yes'){
+          breadcrumb(pro_id,breadtimelimit);
+       // }
         google.maps.event.addListener(map, "dblclick", function(event) {
                placeMarker(event.latLng,'dbclick'); 
         });
         
-       google.maps.event.addDomListener(window, 'resize', function() {
-            var center = map.getCenter()
-            google.maps.event.trigger(map, "resize")
-            map.setCenter(center)
-        })
+        // this is our gem
+        google.maps.event.addDomListener(window, "resize", function() {
+          // if(mheader == 'yes') {
+            google.maps.event.trigger(map, "resize");
+            var splitStr        = get_user_changed_position("myMapCookie"); 
+            var trackedStr      = get_user_changed_position("trackedUser_position");
+            if(splitStr!='' || trackedStr!=''){
+              var   savedMapLat        = (trackedStr!='')?parseFloat(trackedStr[0]):parseFloat(splitStr[0]);
+              var   savedMapLng        = (trackedStr!='')?parseFloat(trackedStr[1]):parseFloat(splitStr[1]);
+              var   savedMapZoom       = (trackedStr!='')?parseFloat(trackedStr[2]):parseFloat(splitStr[2]);
+              map.setCenter(new google.maps.LatLng(savedMapLat,savedMapLng));
+              map.panBy(20,250);
+            }
+            else
+            {
+               map.setCenter(markers[sel_group_id].getPosition());
+               map.panBy(20,250);
+            }
+        });
         
         // as a suggestion you could use the event listener to save the state when zoom changes or drag ends
         google.maps.event.addListener(map, 'tilesloaded', tilesLoaded);    
@@ -373,20 +459,17 @@
             filters  += '<li class="text-center invisible-head">Static Maps/Clues</li>'
             filters += clues;
         }
-       
         document.getElementById("participants-list").innerHTML = partcipanthead + filters;
-      
     }
     
    
     var marker;    
     function placeMarker(location,eventtype = '') {
-       
         if(marker){ 
             marker.setPosition(location); 
-        }else
+        }
+        else
         {
-           
             if(eventtype != 'dragevent') {
                 marker = new google.maps.Marker({ 
                     position: location, 
@@ -405,16 +488,62 @@
               if(results[0]) {
                 $(".popover #guest_address").val(results[0].formatted_address);
               }
-              else {
+              else 
+              {
                 $(".popover #guest_address").val("No results");
               }
             }
-            else {
-              $("guest_address").val(status);
-            }
+            else 
+             {
+               $("guest_address").val(status);
+             }
           });
      }    
+   
+   function codeAddress(address) {
+    //var address = document.getElementById('address').value;
+    geocoder.geocode( { 'address': address}, function(results, status) {
+      if (status == 'OK') {
+        map.setCenter(results[0].geometry.location);
+        var marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+        });
+      } else {
+        alert('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+  }
         
+   function drag(event) {
+    //alert(event);
+      event.dataTransfer.setData('text/html', "Pegman Drag"); //cannot be empty string
+      
+    google.maps.event.addListener(map, 'mouseover', function(event) {
+    geocoder.geocode( {'latLng': event.latLng},
+          function(results, status) {
+            if(status == google.maps.GeocoderStatus.OK) {
+              if(results[0]) {
+                $(".popover #guest_address").val(results[0].formatted_address);
+              }
+              else 
+              {
+                $(".popover #guest_address").val("No results");
+              }
+            }
+            else 
+            {
+               $("guest_address").val(status);
+             }
+          });
+    // marker = new google.maps.Marker({position: event.latLng, map: map});
+
+  });
+    // ev.dataTransfer.setData("text", ev.target.id);
+    // var add = $(".popover-content #guest_address").val();
+    // codeAddress(add);
+  }
+     
     function myclick(i,tag) 
     {
         if(tag == 1 )
@@ -426,9 +555,7 @@
          map.fitBounds(bounds);
          
          map.setCenter(markers[i].getPosition());
-         //if(reloadzoomlvl==1)
-          //map.setZoom(17);
-         
+        
     }
 
     function posclick(i) 
@@ -475,8 +602,6 @@
     });
 
    
-   
-  
   function user_position_save(user_id){
      
       var latlon = $("#latlang").val();
@@ -492,13 +617,10 @@
              
             //ajax_loader(1);
             window.localStorage.setItem('mapzoom', '1');
-
             var srchkey = $("#search").val();
 
             if(srchkey!=''){
-
-                $.post('<?php echo site_url();?>/home/search/'+srchkey+'/1', {}, function(response){
-                
+                $.post('<?php echo site_url();?>/home/search/'+srchkey+'/1', {}, function(response){  
                     if(response!=''){
                         response = JSON.parse(response);
                         map_search(response.locations,response.contents,response.user_id,0);
@@ -612,54 +734,74 @@ function getCookie(c_name) {
 function trackuser()
 {
     
-    var already_tracked = tracker_details("trackeduser");
-    
-       if(!$(".track_userr").is(":checked")){
-         if(confirm("You want untrack this member "+already_tracked)) {
-             alert("You are untracked this member "+already_tracked);
-             
+   var already_tracked = tracker_details("trackeduser");
+  
+       if(already_tracked !=''){
+           //remove highlight already tracked user
+            $("#"+already_tracked).removeClass("highlight");
+            $("#"+already_tracked).addClass("sprite-image");
+       }
+       
+       if((!$(".track_userr").is(":checked")) && (pro_id == '')){
+         if(confirm("Do you want to cancel track this member: "+already_tracked)) {
              document.cookie="trackeduser=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
              document.cookie="trackinguser=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
              document.cookie="trackmapID=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
              document.cookie="trackedUser_position=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+             document.cookie="track_user_type=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
              return true;
          }
        }
        else
        {
          
-           $("input[type='checkbox']").prop( "checked", function( i, val ) {
-            
-                  var uid = $(".track_userr").attr("data-uid");
-                  var sid = $(".track_userr").attr("data-mapsearch");
-                  var cid = $(".track_userr").attr("data-chid");
-              
-                  var al_uid = getCookie("trackinguser");
+           $(".tuser").prop( "checked", function( i, val ) {
                   
-                  var mapZoom   = map.getZoom(); 
-                  var mapCentre = map.getCenter(); 
-                
-                  var mapLat = mapCentre.lat(); 
-                  var mapLng = mapCentre.lng(); 
+                  $(this).attr("checked","checked");
+                  var uid          = $(".track_userr").attr("data-uid");
+                  var sid          = $(".track_userr").attr("data-mapsearch");
+                  var cid          = $(".track_userr").attr("data-chid");
+                  var tutype       = $(".track_userr").attr("data-usertype");
+                  var al_uid       = getCookie("trackinguser");
+                  var mapZoom      = map.getZoom(); 
+                  var mapCentre    = map.getCenter(); 
+                  var mapLat       = mapCentre.lat(); 
+                  var mapLng       = mapCentre.lng(); 
                   var cookiestring = mapLat+"_"+mapLng+"_"+mapZoom;
-                  setCookie("trackedUser_position",cookiestring, 30);
+                  
                       
                   if(uid == al_uid) {
-                    if(confirm("You want untrack this member "+tracker_details("trackeduser"))) {
+                    if(confirm("Do you want to cancel track this member "+tracker_details("trackeduser"))) {
                       setCookie("trackeduser",cid,2);
+                      setCookie("track_user_type",tutype,2);
+                      setCookie("trackedUser_position",cookiestring, 30);
+                      
+                      //highlight tracked user 
+                      $("#"+cid).addClass("highlight");
+                      
                     }
                   }
                   else
                   {
-                     setCookie("trackeduser",cid,2);
-                     setCookie("trackinguser",uid,2);
-                     setCookie("trackmapID",sid,2);
-                     alert("You are tracked this member "+cid);
-                     return true; 
-                  }
-                 
+                   
+                   // var trk = (utype == 'admin')?true:confirm("Do you want to track this member: "+cid);
+                    if(confirm("Do you want to track this member: "+cid)) {
+                         setCookie("trackeduser",cid,2);
+                         setCookie("trackinguser",uid,2);
+                         setCookie("trackmapID",sid,2);
+                         setCookie("trackedUser_position",cookiestring, 30);
+                         setCookie("track_user_type",tutype,2);
+                         
+                         //highlight tracked user 
+                         $("#"+cid).addClass("highlight");
+                         if(utype != 'admin') {
+                            alert("You are now tracking map member: "+cid);
+                         }
+                         return true; 
+                    } 
+                  }   
            });
-    } 
+    }
 }
 
 function get_user_changed_position(cookie_name) {
@@ -673,5 +815,221 @@ function tracker_details(cookie_name) {
     return trackdet;
 }
 
+function breadcrumb(user_id='',timelimit='')
+{
+    if($("#breadcrumb"+timelimit).prop('checked') == false){
+         document.cookie="breadcrumb_user=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+         document.cookie="breadcrumb_timelimit=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+         setTimeout(function(){$("#allow_dy").trigger("click");},2000); 
+    }
+    else
+    { 
+         if(timelimit == 1){
+            if($("#breadcrumb"+timelimit).prop('checked') == true){
+              $("#breadcrumb"+timelimit).attr("checked","checked");
+              $("#breadcrumb2").removeAttr("checked");
+              $("#breadcrumb0").removeAttr("checked");
+            }
+         }
+         else if(timelimit == 2)
+         {
+            if($("#breadcrumb"+timelimit).prop('checked') == true){
+              $("#breadcrumb"+timelimit).attr("checked","checked");
+              $("#breadcrumb1").removeAttr("checked");
+              $("#breadcrumb0").removeAttr("checked");
+            }
+         }
+         else
+         {
+            if($("#breadcrumb"+timelimit).prop('checked') == true){
+              $("#breadcrumb"+timelimit).attr("checked","checked");
+              $("#breadcrumb2").removeAttr("checked");
+              $("#breadcrumb1").removeAttr("checked");
+            }
+         }
+    
+    
+        if($("#breadcrumb"+timelimit).prop('checked') == true){
+            $("#breadcrumb"+timelimit).attr("checked","checked");
+        }
+        var timelimit = (timelimit=='')?$('input[name=breadcrumb]:checked').val():timelimit;
+        setCookie("breadcrumb_user",user_id,2);
+        setCookie("breadcrumb_timelimit",timelimit,2);
+        
+        if(timelimit == 'undefined'){
+            timelimit = 0;
+        }
+           
+        var markers = new Array(), marker='';            
+        $.ajax({
+        type:"POST",
+        url:'<?php echo site_url();?>home/breadcrumb/'+user_id+"/"+timelimit,
+        data:'',
+        success:function(response){
+            if(response!=''){
+                response  = JSON.parse(response);
+                for(var i = 0;i<response.length;i++){
+                    var markericon = (response[i].flag==2)?'<?php echo site_url();?>'+"assets/image/purple_pos.png":(response[i].flag==0)?'<?php echo site_url();?>'+"assets/image/yellow_pos.png":'<?php echo site_url();?>'+"assets/image/red_pos.png";
+                    var marker     = new google.maps.Marker({
+                                                             position: new google.maps.LatLng(response[i].lat, response[i].lon),
+                                                             map: map,
+                                                             draggable:false,
+                                                             icon:markericon
+                                                           });
+                    markers.push(marker);  
+                    setTimeout(function(){closeinfowindow();},3000);         
+                }
+                var srchkey = $("#search").val();
+                if(srchkey!=''){
+                    $.post('<?php echo site_url();?>/home/search/'+srchkey+'/1', {}, function(response){  
+                        if(response!=''){
+                            response = JSON.parse(response);
+                            map_search(response.locations,response.contents,response.user_id,0,"no");
+                        }
+                    });
+                }
+             }  
+           }  
+      });
+   }  
+}
+
+var dropzone = document.getElementById('dropzone'),
+    draggable = document.getElementById('draggable');
+
+
+function onDragStart(event) {
+   event.preventDefault();
+    event.dataTransfer.setData('text/html', null); //cannot be empty string
+}
+
+function onDragOver(event) {
+    var counter = document.getElementById('counter');
+    counter.innerText = parseInt(counter.innerText, 10) + 1;
+}   
+
+draggable.addEventListener('dragstart', onDragStart, false);
+dropzone.addEventListener('dragover', onDragOver, false);
+
+function clear_track()
+{
+    //if($("#clear_tracking").prop(":checked")==true){
+         document.cookie="trackeduser=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+         document.cookie="trackinguser=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+         document.cookie="trackmapID=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+         document.cookie="trackedUser_position=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+         document.cookie="track_user_type=;expires=Mon, 01 Jan 2015 00:00:00 GMT";
+         location.reload();
+         return true;
+   // } 
+}
 
 </script>
+
+
+
+
+
+<script type="text/javascript">
+	
+		
+		$(document).ready(function(){
+			
+			$(".refresh-clk").click(function(){
+			
+			window.location.reload();
+    
+			});
+            
+            $("#map").on("touchstart", function(e) { dragFlag = true; start = e.originalEvent.touches[0].pageY; });
+			
+		});
+		
+		
+		
+		/*  2 nd script Timer */
+		
+	var h1 = document.getElementsByTagName('h2')[0],
+    start = document.getElementById('start'),
+    stop = document.getElementById('stop'),
+    clear = document.getElementById('clear'),
+    seconds = 0, minutes = 0, hours = 0,
+    t;
+
+function add() {
+    seconds++;
+    if (seconds >= 60) {
+        seconds = 0;
+        minutes++;
+        if (minutes >= 60) {
+            minutes = 0;
+            hours++;
+        }
+    }
+    
+    h1.textContent = (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds);
+
+    timer();
+}
+function timer() {
+    t = setTimeout(add, 1000);
+}
+timer();
+
+
+/* Start button */
+start.onclick = timer;
+
+/* Stop button */
+stop.onclick = function() {
+    clearTimeout(t);
+}
+
+/* Clear button */
+clear.onclick = function() {
+    h1.textContent = "00:00";
+    seconds = 0; minutes = 0; hours = 0;
+}
+
+
+	/* Timer set interval */
+
+		
+	$(document).ready(function(){	
+		
+		setInterval(refresh_timer, 120000);	
+		
+	});
+		
+	function refresh_timer()
+	{
+		
+	  $('#clear').trigger('click');
+
+	}
+		
+</script>
+
+	<style type="text/css">
+	*{
+		margin: 0;
+		padding: 0;
+	}
+
+	
+
+	input, textarea
+
+		{
+
+		width: 100px;
+
+		font: normal 10pt verdana;
+
+		}
+
+</style>
+
+
+
+

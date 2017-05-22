@@ -25,19 +25,25 @@
 <link rel="stylesheet" href="<?php echo base_url();?>assets/css/social-buttons-share.css">
  <link rel="icon" href="<?php echo site_url();?>assets/image/fevicon.ico" type="image/gif" sizes="16x16"> 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
-<script src="<?php echo base_url();?>assets/js/jquery-1.10.2.js"></script> 
-<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script> 
+<!--
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+-->
 
 <script src="<?php echo base_url();?>assets/js/social-buttons-share.js"></script>
 
-<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true"></script>
+<script src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
 <script src="<?php echo base_url();?>assets/js/infobox.js"></script>
 <script async src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-
+<!--
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+-->
 <script>
  var service_resp = <?php echo json_encode($service_resp);?>;
 
  var user_info = <?php echo json_encode($user_info);?>;
+ 
+ var uid = '<?php echo $user_id; ?>';
 
  var site_url = '<?php echo site_url();?>';
  var base_url = '<?php echo base_url();?>';
@@ -95,7 +101,6 @@ function geolocation() {
       }      
       else
       {
-       
           //if(typeof user_info === "object" && user_info['user_id']==''){
 //            setTimeout(function(){ guest_registration('auto'); },3000);
 //          }
@@ -106,8 +111,11 @@ function geolocation() {
 }
 
 if(typeof user_info === "object" && user_info['user_id']==''){
-    setTimeout(function(){ guest_registration('auto'); },10000);
+    setTimeout(function(){ guest_registration('auto'); },5000);
+    setTimeout(function(){$("#display_pp").trigger("click");},9000);
 }
+
+ 
 
 //$(document).ready(function() {
 //var man_addr = '<?php //echo $manual_address; ?>';
@@ -145,7 +153,6 @@ if(typeof user_info === "object" && user_info['user_id']==''){
               <div class="sec-9 clearfix"> 
                   <a href="javascript:;" onclick="copyToClipboard('#search','#websitesearch_text')" >
                     <img src="<?php echo base_url();?>assets/image/copy.png"  class="img-responsive" alt="copy" />
-                    
                   </a>
                </div>
 
@@ -157,7 +164,6 @@ if(typeof user_info === "object" && user_info['user_id']==''){
                <div class="sec-9 clearfix"> 
                   <a href="mailto:?subject=Here's MyGPS&body=Hi, View my location on live map and join me at: <?php $grp = (!empty($map_search_key))?$map_search_key:get_cookie("map_search"); echo site_url('search/'.$grp);?> " target="_blank" >
                     <img src="<?php echo base_url();?>assets/image/email_send.png"  class="img-responsive" alt="email" />
-                    
                   </a>
                </div>   
             </div>
@@ -166,7 +172,6 @@ if(typeof user_info === "object" && user_info['user_id']==''){
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
-      
     </div>
   </div>
   

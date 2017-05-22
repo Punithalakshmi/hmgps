@@ -165,11 +165,13 @@
             </div>
             <div id="popover-content" class="hide">
                                 
-            <span class="popover-tl"><img src="<?php echo site_url();?>assets/image/Peg man_Circle.png" class="img-responsive pegman" onmouseover="msover(this);" alt="Responsive image" /></span> 
+            <span class="popover-tl">
+            <img src="<?php echo site_url();?>assets/image/Place Marker.png" class="img-responsive pegman" onmouseover="msover(this);" alt="Responsive image"  /></span> 
+<span id="dropzone"></span>
             <span class="popover-bl"><a onclick="viewyouraddress();"><img src="<?php echo site_url();?>assets/image/eye.png" class="img-responsive" alt="Responsive image" title="Preview Address" /></a></span>
             
             <div class="input-group">
-                    <textarea class="form-control noresize" style="resize:none" id="guest_address" name="guest_address" placeholder="Enter Address"><?php //echo (isset($manual_address) && !empty($manual_address))?$manual_address:""; ?></textarea>
+                    <textarea class="form-control noresize" style="resize:none" id="guest_address" name="guest_address" placeholder="Enter Address or Zipcode or Drag red pin to your position"><?php //echo (isset($manual_address) && !empty($manual_address))?$manual_address:""; ?></textarea>
                     <span class="input-group-addon" onclick="create_map('guest_pos_type',<?php echo $usrchk;?>,'.popover-content #guest_address','manual','');"><span class="glyphicon glyphicon-ok"></span></span>
                 </div>
             <span class="popover-tr"><a onclick="create_map('guest_pos_type',<?php echo $usrchk;?>,'.popover-content #guest_address','manual');">
@@ -197,14 +199,19 @@
           <div id="adv-search" class="input-group">
               <label>Search</label>
                 <input type="text" placeholder="Search here.." value="<?php echo $search_val;?>" name="search" id="search" class="form-control" />
+                 <label></label>
+                <input class="pass-sec" type="password" placeholder="Enter password.." value="" name="pwd" id="pwd" class="form-control" />
                 <div class="input-group-btn">
                     <div role="group" class="btn-group">
-                        
                         <button class="btn btn-primary btn-msearch" type="submit">
                         <img src="<?php echo base_url();?>assets/image/hand-symbol.png" class="img-responsive" alt="hand-symbol-icon"></button>
-                    </div>
+                    </div>                   
                 </div>
+                
           </div>
+          
+      
+          
         </form>  
         </div>
         <a  class="toggle-arrow" id="headerup">

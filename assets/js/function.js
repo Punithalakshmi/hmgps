@@ -6,6 +6,7 @@ function msover(x) {
 }
 
 
+
 $(function() {
 
    $("[data-toggle='tooltip']").tooltip(); 
@@ -15,6 +16,9 @@ $(function() {
 $("#guest_current").click(function(){
    $("#popover").popover('hide'); 
 });
+
+
+
 
 
 //delete the set zoomlevel cookie
@@ -59,8 +63,56 @@ $("#display_name").keyup(function() {
 });
 
 
-if(service_resp['status']=='error')
-    	$('#error_throw').modal('show');
+if(service_resp['status']=='error'){	
+      var request_type = service_resp['request_type'];
+      
+      if(request_type == 'password_protect') {
+        if(confirm(service_resp['message'])) {
+            $("#pwd").attr("placeholder","");
+            $("#pwd").focus();
+            $(".subm").hide();
+            $(".pass_protect").removeAttr('style');
+            $("#pwd").val();
+            
+            //$("#pwd").attr("title","Please enter group password here");
+            return false;
+        }
+        else
+        {
+            $(".subm").show();
+            $(".pass_protect").hide();
+            return true;
+        }
+       } 
+        else if(request_type=='allow_deny')
+        {
+          if(confirm(service_resp['message'])) {
+                //ajax_loader(0);
+                var joinkey = $("#search").val();
+                var data = {joinkey:joinkey,user_id:user_info.user_id};
+                
+                 $.post(site_url+'/home/allow_deny_restriction', data, function(response){
+                      ajax_loader(0);
+                      if(response.status=='success'){
+                        alert(response.msg);
+                      //  $("#allow_dy").trigger('click');
+                        //if($("#search")){
+//                            $("#search").trigger("click");
+//                        }
+                      }
+                      else                
+                      { 
+                        alert(response.msg);
+                      }
+                    }, "json");
+           } 
+        } 
+      else
+      {
+        $('#error_throw').modal('show');
+      }
+}
+
 
  $("#create-map,#quickshareicon").click(function(){ $('#create_new_map').modal('show'); });   
 
@@ -124,6 +176,11 @@ function ajax_loader(type)
 
 }
 
+function displayup(id)
+{
+    $(id).attr("checked","checked");
+}
+
 function popupclose()
 {
     $("#popover").popover('hide'); 
@@ -184,7 +241,22 @@ function guest_registration(type,clsname)
 
         if(loctype==1){
           if(latlon=='' || latlon==0 || latlon==1 || latlon==2){
-            errors += "Sorry, browser does not support geolocation! \n"; p=1;
+            $("#popover").trigger('click');
+            var add = $('.popover-content #guest_address').val();
+            if(add!=''){
+
+              //latlon = $('#map_pos').val();
+              latlon = $('.popover-content #guest_address').val();
+              
+              addtype   = 'manual';          
+              
+            }
+            else
+            {
+
+               errors += "Please eneter the address \n"; p=1;
+            } 
+            //errors += "Sorry, browser does not support geolocation! \n"; p=1;
           } 
         }
         else
@@ -253,10 +325,25 @@ function user_update(type,clsname)
         }
 
         var loctype = $("input[name=guest_pos_type]:checked").val();
-
+      
         if(loctype==1){
           if(latlon=='' || latlon==0 || latlon==1 || latlon==2){
-            errors += "Sorry, browser does not support geolocation! \n"; p=1;
+            $("#popover").trigger('click');
+            var add = $('.popover-content #guest_address').val();
+            if(add!=''){
+
+              //latlon = $('#map_pos').val();
+              latlon = $('.popover-content #guest_address').val();
+              
+              addtype   = 'manual';          
+              
+            }
+            else
+            {
+
+               errors += "Please eneter the address \n"; p=1;
+            } 
+            //errors += "Sorry, browser does not support geolocation! \n"; p=1;
           } 
         }
         else
@@ -301,6 +388,68 @@ function user_update(type,clsname)
           
         }, "json");
      
+}
+
+function update_disp_name()
+{
+     var dispname = $("#custom_display_name").val();
+     var phonenum = $("#custom_phonenumber").val();
+     
+     if(($("#system_disp_update").prop("checked")==true) && ($("#system_phonenumber").prop("checked")==true)){
+        alert("You should enter Display Name or Phone Number");
+        return false;
+     }
+     
+     if(($("#system_disp_update").prop("checked")==true) && ($("#system_phonenumber").prop("checked")==false) && ($("#custom_phone_update").prop("checked")==false)){
+        alert("You should enter Display Name or Phone Number");
+        return false;
+     }
+     
+     if(($("#system_disp_update").prop("checked")==false) && ($("#custom_disp_update").prop("checked") == false)){
+        alert("Please Select any one of the option in display name section");
+        return false;
+     }
+     
+     
+     if(dispname == '' && ($("#system_disp_update").prop("checked")==false)){
+        alert("Please Enter display name");
+        return false;
+     }
+   
+     if($("#custom_disp_update").prop("checked") == true){
+        dispname = dispname;
+        var updated_type = 'custom';
+     } 
+     else
+     {
+        dispname = user_info.display_name;
+        var updated_type = 'system';
+     }  
+     
+     if($("#custom_phone_update"). prop("checked") == true){
+        phonenum = phonenum;
+        var updated_phonenumber = 'custom';
+     }
+     else
+     {
+        phonenum = user_info.phonenumber;
+        var updated_phonenumber = 'system';
+     }
+      //alert(dispname);
+      
+       ajax_loader(1);
+
+        var data = {phone:phonenum,display:dispname,user_id:user_info.user_id,updated_type:updated_type,updated_phonenumber:updated_phonenumber};
+
+        $.post(site_url+'/home/user_update_displayname', data, function(response){
+
+          ajax_loader(0);
+
+          alert(response.msg);
+          
+          location.reload();
+          
+        }, "json");   
 }
 
 function invisible_participant(user_id,grp_id)
@@ -424,6 +573,38 @@ function checkUserId()
     
     if(user_id == ''){
         alert('You are not registered yet!');
+        location.reload();
         return false;
     }
+    return true;
+}
+
+
+function copyToClipboard_popup() {
+var element = "#lan_log";
+var altdiv = "#alert_popup";
+
+  var $temp =$("<input>");
+
+  $("body").append($temp);
+  $temp.val($(element).val()).select();
+  document.execCommand("copy");
+  $temp.remove();
+  //var url = site_url+"/search/"+$(element).val();
+  var text = $(element).val();
+  $(altdiv).css("display","block").html("Copied "+text+" to clipboard");
+  $(altdiv).fadeOut(4000);
+
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+
+function drop(ev) {
+    
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    ev.target.appendChild(document.getElementById(data));
 }

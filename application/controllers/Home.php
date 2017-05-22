@@ -39,21 +39,25 @@ class Home extends CI_Controller {
 		 $this->data['user_info'] = "";
 	     $this->get_user_details();
        
-         $user_id= get_cookie('map_user_id');
+         $user_id = get_cookie('map_user_id');
+         
+         $this->data['user_id'] = $user_id;
          
          $this->data['manual_address'] = $this->user_manual_address($user_id,"search");
     }
 
 	public function index()
-	{
+	{ 
 		$this->layout->view('index',$this->data);
 	}
 
 	public function search($search='',$ajax=0)
 	{
+	   
 		try{
 
 			$joinkey='';
+            $breadcrumb_status = 0;
 			$user_id=0;
 			
 			$locations=array();
@@ -64,11 +68,12 @@ class Home extends CI_Controller {
 
 			if(isset($_POST['search'])){
 				$joinkey = $this->input->post('search');
-
+                $pwd     = $this->input->post('pwd');
+                
 				if(!$joinkey)
 					throw new Exception("Please fill the required fields.");
-
-				delete_cookie('map_search');
+                       
+				delete_cookie('map_search');  
 			}
 			elseif($search!='')
 			{
@@ -78,16 +83,18 @@ class Home extends CI_Controller {
 			{
 				$joinkey = $map_cookie;
 			}	
-
+            
+            //echo $joinkey; exit;
+                
 			$user_id = get_cookie('map_user_id');
              
 			if(!empty($user_id)){				
 				$cookie = array(
-						'name' => 'map_user_id',
-						'value' => $user_id,
-						'expire' => time()+86400,
-						'path'   => '/',
-						);
+        						'name' => 'map_user_id',
+        						'value' => $user_id,
+        						'expire' => time()+86400,
+        						'path'   => '/',
+						       );
 				set_cookie($cookie);
 			}
 
@@ -95,21 +102,28 @@ class Home extends CI_Controller {
 			if($joinkey!=''){	
 
 				$cookie = array(
-					'name' => 'map_search',
-					'value' => $joinkey,
-					'expire' => time()+3600,
-					'path'   => '/',
-					);
+            					'name' => 'map_search',
+            					'value' => $joinkey,
+            					'expire' => time()+3600,
+            					'path'   => '/',
+					           );
 				set_cookie($cookie);	
 				$this->data['map_search_key'] = $joinkey;	
 			}
-            $this->service_param['user_id'] = $user_id;
+            $this->service_param['user_id']  = $user_id;
 		    $this->service_param['join_key'] = $joinkey;
-                
-                
-              //  print_r($this->service_param); exit;
-	   		$map_det = $this->rest->get('search_map', $this->service_param, 'json');
+            $this->service_param['allowed'] = 'no';
             
+             if(!empty($pwd)){
+                $this->service_param['password'] = (!empty($pwd))?$pwd:"";
+                $map_det = $this->rest->get('check_group_password', $this->service_param, 'json');
+             } 
+             else
+             {
+                  $this->service_param['type']     = "join";
+	   		      $map_det = $this->rest->get('search_map', $this->service_param, 'json');
+             }
+           //  print_r($map_det); exit;
 	   		$map_det = (array)$map_det;
            
 	   		if(empty($map_det))
@@ -120,60 +134,100 @@ class Home extends CI_Controller {
 	   		if(!isset($_POST['search']) && $joinkey=='')
 	   			$service_status['status']='';
 
-	   		if($map_det['status']=='error')
-	   			$service_status['message'] = $map_det['msg'];
-
+	   		if($map_det['status']=='error'){
+	   			$service_status['message']       = $map_det['msg'];
+                $service_status['request_type']  = $map_det['request_type'];
+            }
+            
 	   		$this->data['service_resp'] = $service_status;
-          
-	   		if(isset($map_det['status']) && $map_det['status']=='success' && isset($map_det['members']) && !empty($map_det['members'])){
-               
-	   			foreach($map_det['members'] as $val){
+
+            $current_tracked_user = ''; $trackd_user = '';
                    
+	   		if(isset($map_det['status']) && $map_det['status']=='success' && isset($map_det['members']) && !empty($map_det['members'])){
+               //echo "<pre>";
+               //print_r($map_det['members']);
+               
+                if(isset($map_det['type']) && ($map_det['type']=='public')){
+                   $map_locations = array(ucfirst($joinkey),$map_det['lat'],$map_det['lon']); 
+                }
+                
+	   			foreach($map_det['members'] as $val){
+                  
+                   $user_type = $val->user->profile->user_type;
+                    
 	   				if($val->user->profile->flag==0)
 	   					continue;
 
 	   				$lastseen = date('d-m-Y H:i',$val->user->group->last_seen_time);
 
-	   				$currtime = date('d-m-Y H:i',strtotime('-1 hour'));
-
-	   				$lastup = 1;
-	   				if(strtotime($currtime) >= strtotime($lastseen))
-	   				{
-	   					if($val->user->profile->user_type=='member')
-	   						continue;
-
-	   					$lastup = 0;
-	   				}	
-
+	   				//24 hours last update time check
+                    $twenty_four_time = date('d-m-Y H:i',strtotime('-24 hour'));
+                    
+                    if(strtotime($twenty_four_time) > strtotime($lastseen)){
+                        continue;
+                    }
+                    
+                    $currtime = date('d-m-Y H:i',strtotime('-1 hour'));
+                
+                    $lastup   = 1;
+                    
+                    if(strtotime($currtime) <= strtotime($lastseen)){
+                       $lastup   = 1; 
+                    }
+                    
+                    if((strtotime($currtime) > strtotime($lastseen)) && (strtotime($twenty_four_time) < strtotime($lastseen))) {  
+                        if($usertype == 'member') {
+                           continue;
+                        }
+                        
+                      $lastup = 0;
+                    
+                    }
+                    
 	   				$displayname = $val->user->profile->display_name;
 	   				$channel_id  = $val->user->profile->default_id;
 	   				$phone_num   = $val->user->profile->phonenumber;
-
-	   				if($val->user->profile->user_type == 'admin'){
+                 
+	   				if($user_type == 'admin' && ($map_det['type']!='public')){
 	   					$displayname = $val->user->group->description;
-	   					$channel_id  = $val->user->group->join_key;
+	   					$channel_id  = $val->user->group->join_key;  
 	   				}
 	   			
-                    $group_invisible = $val->user->group->invisible;	
-	
-	   				$locations[]      = array($displayname,$val->user->position->lat,$val->user->position->lon,$lastup,$val->user->profile->user_type,$channel_id,$group_invisible,'');
-                    $static_maps[]    = (array)$val->user->static_map->maps;
+                    $group_invisible = $val->user->group->invisible;
+      	              
+	                if(isset($_POST['search']) && !empty($_POST['search'])){
+	                    
+	                   if($user_type == 'admin') {
+                           $breadcrumb_admin_user = $val->user->profile->id; 
+                           $current_tracked_user = $channel_id;
+                       } 
+                    }
+                      if($user_type !='public'){
+                        $iconImage  = (!empty($user_type) && ($user_type=='admin'))?"/assets/image/violet-icon.png":"/assets/image/green-icon.png";
+                      }
+                      else
+                      {
+                         $iconImage = "/assets/image/orange-icon.png";
+                      }
+                   
+                    $img = array(base_url()."/assets/image/red-icon.png",base_url().$iconImage);
+                        
+	   				$locations[]      = array($displayname,$val->user->position->lat,$val->user->position->lon,$lastup,$val->user->profile->user_type,$channel_id,$group_invisible,'',$val->user->profile->id,$img[$lastup]);
+                    //$static_maps[]    = (array)$val->user->static_map->maps;
                     $st_map_user_id[] = $val->user->static_map->user_id;
-                    
-	   				$img = base_url().'assets/image/default-user.png';
-
-	   				if($val->user->profile->profile_image !='' && file_exists($val->user->profile->profile_image))
-	   					$img = $val->user->profile->profile_image;
-
+                    // echo $val->user->profile->profile_image;
+                    $pro_pic   = $val->user->profile->profile_image;
+	   				$img       = (!empty($pro_pic) && fopen($pro_pic, "r"))?$val->user->profile->profile_image:base_url().'assets/image/default-user.png';
+  					 	
 	   				$browseloc = 'http://maps.google.com/maps?z=12&t=m&q=loc:'.$val->user->position->lat.'+'.$val->user->position->lon;
 
                     $groups = $this->db->query("select * from groups where join_key='".$joinkey."'")->row_array();
-                    
+                    $str = '';
+                    		
 	   				$str    = '<div id="seach_content">
-	   					       <span data-role="close" onclick="closeinfowindow()">X</span>
 				             <div class="user_info">
 							<div class="user">
-								<img src="'.$img.'" alt="user-image" />
+								<img src="'.$img.'" width="90" height="80" alt="user-image" />
 							</div>
 
 							<div class="user_id">
@@ -200,7 +254,11 @@ class Home extends CI_Controller {
 							<hr />
 							<div class="time_content">
 								<h5>GPS Coordinate <img src="'.base_url().'assets/image/searchatlas-256.png" alt="seach-gps" /></h5>
+<input type="hidden" id="lan_log" value="'.$val->user->position->lat.' , '.$val->user->position->lon.'" name="phone" class="map-id form-control" readonly/>
+							<div id="alert_popup" role="alert"></div>
+							<a href="javascript:;" class="get-content" onclick="copyToClipboard_popup();">
 							    <p>'.$val->user->position->lat.' , '.$val->user->position->lon.'</p>
+							</a>
 							</div>
 							<hr />
 
@@ -216,35 +274,77 @@ class Home extends CI_Controller {
                              if($this->data['user_info']['channel_id'] == $channel_id) {
                                     $str .='<li><a onclick="invisible_participant('.$val->user->profile->id.','.$groups['id'].')"><img src="'.base_url().'assets/image/invisible_participant_icon.png" target="_blank" alt="Invisible Participant" /></a></li>';
                                 } 
-                              $tracked_user = get_cookie("trackeduser");  
-                              $checked = (($tracked_user == $channel_id)|| ($tracked_user == $displayname))?'checked="checked"':"";
-                              $str .='<li><input type="checkbox" value="track" '.$checked.' class="track_userr" data-chid="'.$channel_id.'" data-mapsearch="'.get_cookie('map_search').'" data-uid="'.get_cookie('map_user_id').'" onclick="trackuser();" />Track User</li>';  
-							$str .= '</ul>
-
+                              $breadcrumb_user      = get_cookie('breadcrumb_user');
+                              $breadcrumb_timelimit = get_cookie('breadcrumb_timelimit'); 
+                              $current_tracked_user = get_cookie('trackeduser');
+                              
+                             // $bread1 = ((($breadcrumb_admin_user == $val->user->profile->id) && ($breadcrumb_timelimit == 1)))?'checked="checked"':"";
+                              $bread2 = (($breadcrumb_user == $val->user->profile->id) && ($breadcrumb_timelimit == 2))?'checked="checked"':"";
+                              $bread3 = (($breadcrumb_user == $val->user->profile->id) && ($breadcrumb_timelimit == 0))?'checked="checked"':"";
+                              
+                              
+                              //$checked = (($current_tracked_user == $channel_id) || ($current_tracked_user == $displayname))?'checked="checked"':"";
+                              //echo $current_tracked_user;
+                              $checked = '';
+                              if(($current_tracked_user == $channel_id) || ($current_tracked_user == $displayname) ){
+                                $checked = 'checked="checked"';
+                              }
+                              else if(($user_type == 'admin') && (empty($current_tracked_user)))
+                              {
+                                $checked = '';
+                              }
+                              
+                              $bread1 = '';
+                              if(($breadcrumb_user == $val->user->profile->id) && ($breadcrumb_timelimit == 1) ){
+                                $bread1 = 'checked="checked"';
+                              }
+                              else if(($user_type == 'admin') && (empty($breadcrumb_user)))
+                              {
+                                $bread1 = 'checked="checked"';
+                              }
+                              
+                              $str .='<li><input type="checkbox" '.$checked.' value="track" class="track_userr tuser'.$val->user->profile->id.'" data-chid="'.$channel_id.'" data-mapsearch="'.$joinkey.'" data-uid="'.get_cookie('map_user_id').'" data-profileid="'.$val->user->profile->id.'" data-usertype="'.$val->user->profile->user_type.'" onclick="trackuser();" />Track User</li>';
+                              $str .='<li><input type="checkbox" '.$bread1.' onclick="breadcrumb('.$val->user->profile->id.',1);" name="breadcrumb1" value="1" id="breadcrumb1" class="breadcrumb user'.$val->user->profile->id.'"  data-uid="'.$val->user->profile->id.'" data-timelimit="1" />10 mins</li>';
+                              $str .='<li><input type="checkbox" '.$bread2.' onclick="breadcrumb('.$val->user->profile->id.',2);" name="breadcrumb2" value="2" id="breadcrumb2" class="breadcrumb"  data-uid="'.$val->user->profile->id.'" data-timelimit="2" />24 Hours</li>';  
+                              $str .='<li><input type="checkbox" '.$bread3.' onclick="breadcrumb('.$val->user->profile->id.',0);" name="breadcrumb0" value="0" id="breadcrumb0" class="breadcrumb"  data-uid="'.$val->user->profile->id.'" data-timelimit="0" />24 Hours in Detail<img src="'.site_url().'assets/image/dots.png" /></li>';
+                            //  $str .='<li><input type="radio" name="breadcrumb" value="clear_trk" class="clear_tracking"  data-timelimit="0" />Clear Tracking</li>';
+							  $str .= '</ul>';
+							  $str .= '<button onclick="breadcrumb('.$val->user->profile->id.');" > OK </button>';
+                              $str .= '<button onclick="clear_track()">Clear Tracking</button>
+                              
 							</div>';
+                            $sr .='<span data-role="close" onclick="closeinfowindow()">CLOSE</span>';
+                            $str .= $sr;
 					
 	   				$contents[] = array($str,$val->user->group->last_seen_time);		
 	   			}
-
 	   			//update current active group
 	   			if((int)$user_id && $joinkey!=''){
 
 	   				$this->service_param['user_id']  = $user_id;
 	   				$this->service_param['group_id'] = $joinkey;
 	   			    $res = $this->rest->get('user_current_group_active', $this->service_param, 'json');
-	   			}	
+	   			}
+                   
+                   $static_maps[] = $map_det['static_maps'];	
 	   		}	
 	   	}
 	   	catch (Exception $e)
         {
-            $service_status = array('status'=>'error','message'=>$e->getMessage());
+            //print_r($e);exit;
+           // echo "<pre>";
+           //echo $e; exit;
+            $service_status = array('status'=>'error','message'=>$e->getMessage(),'request_type' => $e->request_type);
             $this->data['service_resp'] = $service_status;
         } 
+        
        	$this->data['participant_count']    = count($locations);
             
         $stat_maps = array();
         foreach($static_maps as $skey => $svalue){ 
           for($j = 0; $j<count($svalue); $j++) {
+            $clueImage = $svalue[$j]->clue_image;
+            $clueImage = (!empty($clueImage) && fopen($clueImage,'r'))?$clueImage:base_url().'assets/image/default-user.png';
             $gp = $this->db->query("select * from groups where id='".$svalue[$j]->group_id."'")->row_array();
             $ur = $this->db->query("select * from user where id='".$st_map_user_id[$j]."'")->row_array();
             $locations[] = array($svalue[$j]->map_name,$svalue[$j]->lat,$svalue[$j]->lon,'','',$gp['join_key'],'','staticmap');
@@ -252,7 +352,7 @@ class Home extends CI_Controller {
 	   					       <span class="staticmap" onclick="closeinfowindow(1)">CLOSE</span>
             			     	<div class="user_info">
         							<div class="user">
-        								<img src="'.$stat_maps[$j]['clue_image'].'" width="100" height="100" alt="user-image" />
+        								<img src="'.$clueImage.'" width="80" height="60" alt="user-image" />
         							</div>
     							</div>
                                 <hr />
@@ -275,14 +375,26 @@ class Home extends CI_Controller {
              $contents[]      =   array($stmp_str,'') ;             
           }      
         }
-    
-	   	$this->data['user_id']    = $user_id;	
-   		$this->data['locations']  = json_encode($locations,JSON_PRETTY_PRINT);
-   		$this->data['contents']   = json_encode($contents);
+       // echo "<pre>";
+      //  print_r($locations);
+         
+	   	$this->data['user_id']             = $user_id;	
+   		$this->data['locations']           = json_encode($locations,JSON_PRETTY_PRINT);
+   		$this->data['contents']            = json_encode($contents);
+        $this->data['breadcrumb_user']     = $breadcrumb_admin_user;
+        $this->data['breadcrumb_timelimit']= 1;
+        $this->data['breadcrumb_status']   = $breadcrumb_status;
+        $this->data['user_type']           = $user_type;
+        $this->data['type']                = $map_det['type'];
+        $this->data['lat']                 = $map_det['lat'];
+        $this->data['lon']                 = $map_det['lon'];
+        $this->data['location_type']       = $map_det['location_type'];
+        $this->data['join_key']            = $map_det['join_key']; 
+        $this->data['dateupdate']          = $map_det['date_update']; 
 
    		//ajax request rsponse
    		if($ajax==1){
-   			echo json_encode(array('user_id'=>$user_id,'locations'=>$locations,'contents'=>$contents)); exit;
+   			echo json_encode(array('user_id' => $user_id,'locations' => $locations,'contents' => $contents)); exit;
    		}
    		
         $userInfo = $this->data['user_info'];
@@ -323,8 +435,6 @@ class Home extends CI_Controller {
         $grp_id  = (isset($_POST['group_id']))?$_POST['group_id']:"";
         
         $this->db->query("update user_groups set is_visible=1 where group_id='".$grp_id."' and user_id='".$user_id."'");
-        
-        
     } 
     
 	function get_user_details(){
@@ -347,22 +457,21 @@ class Home extends CI_Controller {
 
 	 $join_key = get_cookie('map_search');
 
-		if(!empty($this->service_param['user_id']))
-		{
+		if(!empty($this->service_param['user_id'])){
+		  
 			$this->service_param['join_key'] = $join_key;
 			$userdet = $this->rest->get('get_channel_byuser', $this->service_param, 'json');
 
 			$userdet = (array)$userdet;
 
-			if(!empty($userdet) && $userdet['status']=='success')
-			{	
-				$this->data['user_info'] = array('channel_id' => $userdet['user']->channel_id, 'display_name'=>$userdet['user']->display_name, 'user_id'=>$userdet['user']->user_id,'group_id'=>$userdet['user']->group_id,'joined_group'=>$userdet['joined_group']);
+			if(!empty($userdet) && $userdet['status']=='success'){	
+				$this->data['user_info'] = array('channel_id' => $userdet['user']->channel_id, 'display_name'=>$userdet['user']->udispname,'phonenumber' => $userdet['user']->phonenumber , 'user_id'=>$userdet['user']->user_id,'group_id'=>$userdet['user']->group_id,'joined_group'=>$userdet['joined_group'],"updated_type" => $userdet['user']->updated_type, "updated_phonenumber" => $userdet['user']->updated_phonenumber);
 			}
 		}
 		else
 		{
 			delete_cookie('map_search');
-			$this->data['user_info'] = array('channel_id' => $this->random_channelid(), 'display_name'=>'', 'user_id'=>'','group_id'=>'','joined_group'=>'');
+			$this->data['user_info'] = array('channel_id' => $this->random_channelid(), 'display_name'=>'','phonenumber' =>'' ,'user_id'=> '','group_id'=>'','joined_group'=>'',"updated_type" => 'system',"updated_phonenumber" => "system");
 		}
 	}
         
@@ -425,6 +534,11 @@ class Home extends CI_Controller {
 		$this->service_param['profile_image']= '';
 		$this->service_param['display_name']= ($display)?$display:$phone;
 		$this->service_param['device_id']	= '';
+        $this->service_param['login_type']	= 'website';
+        $this->service_param['password_protect']= 0;
+        $this->service_param['allow_deny']	= 0;
+        $this->service_param['updated_type']	= 'system';
+        $this->service_param['updated_phonenumber'] = 'system';
 		
 
    		$register = $this->rest->get('user_register', $this->service_param, 'json');
@@ -464,11 +578,45 @@ class Home extends CI_Controller {
 			$outputs['msg']   = 'Bad request please try after some time! ';
 	   	}	
 		
-		
+	//	$this->get_user_details();
+        
 		echo json_encode($outputs);
 		exit;	
 	}
 
+    function user_update_displayname()
+    {
+        $phone              = $this->input->post('phone'); 
+		$display            = $this->input->post('display');
+        $user_id            = $this->input->post('user_id');
+        $updated_type       = $this->input->post('updated_type');
+        $updated_phonenumber= $this->input->post('updated_phonenumber');
+        $user_id            = (empty($user_id))?get_cookie('map_user_id'):$user_id;
+        
+        if($user_id==''){
+            $user_data = $this->get_user_details();
+            $user_id   = $user_data['user_id'];
+        } 
+       
+        if(!empty($user_id)){
+            //$upd = (!empty($phone))?"updated_phonenumber='custom'":"updated_phonenumber='system'";
+            $this->db->query("update user set display_name='".$display."', phonenumber='".$phone."', updated_type='".$updated_type."', updated_phonenumber='".$updated_phonenumber."' where id='".$user_id."'");
+            $status = "success";
+            $msg    = "Updated successfully";
+        }
+        else
+        {
+            $status = "error";
+            $msg    = "Guest user not yet created!";
+        }
+        $outputs['status']=$status;
+		$outputs['msg']   = $msg;
+        echo json_encode($outputs);
+		exit;
+    }
+    
+    
+    
 	function user_update()
 	{
 	 
@@ -572,7 +720,7 @@ class Home extends CI_Controller {
 			$outputs=array();
 
 
-			$user_id=get_cookie('map_user_id');
+			$user_id = get_cookie('map_user_id');
 
 			if(!(int)$user_id)
 				throw new Exception("Please register and create map!");
@@ -703,6 +851,82 @@ class Home extends CI_Controller {
              }
            }   
         }
+   }
+   
+   
+   function breadcrumb($user_id='',$timelimit='')
+   {
+		
+            //$user_id = $this->input->post('user_id');
+            $this->service_param['user_id']     = "[".$user_id."]";
+            $this->service_param['time_limit']  = $timelimit;
+        
+            $map = $this->rest->get('get_trigger_positions', $this->service_param, 'json');
+          
+            $map      = (array)$map;
+            $position = (array)$map['positions']->$user_id;
+            
+            $pos_array= array();
+            foreach($position as $pkey=>$pvalue){
+                $pos_array[$pkey]['lon']        = $pvalue->lon;
+                $pos_array[$pkey]['lat']        = $pvalue->lat;
+                $pos_array[$pkey]['flag']       = $pvalue->flag;
+                $pos_array[$pkey]['speed']      = $pvalue->speed;
+                $pos_array[$pkey]['altitude']   = $pvalue->altitude;
+                $pos_array[$pkey]['bearing']    = $pvalue->bearing;
+                $pos_array[$pkey]['update_time']= $pvalue->update_time;
+            }
+            
+    		if(count($pos_array)){
+		   		echo json_encode($pos_array);
+		   		exit;
+	   		}
+   }
+   
+   function allow_deny_restriction()
+   {
+     try {
+              $join_key = $this->input->post('joinkey');
+              $user_id  = $this->input->post('user_id');
+              
+          	  $this->service_param['join_key'] 	= $join_key;
+              $this->service_param['user_id']   = $user_id;
+              
+          	  $res = $this->rest->get('allowdeny_send_notification', $this->service_param, 'json');
+          	  $res = (array)$res;
+              
+              if(empty($res))
+   			       throw new Exception('Service request failed!');
+
+   			  if($res['status']=='error')
+   				  throw new Exception($res['msg']);
+
+                // if($res['status'] == 'success') {
+//                    $this->service_param['join_key'] 	= $join_key;
+//                    $this->service_param['user_id']     = $user_id;
+//                    $this->service_param['cfrom']       = 'website';
+//              
+//          	        $res = $this->rest->get('user_join_request_map', $this->service_param, 'json');
+//                    $res = (array)$res;
+//                    
+//                    $user = $this->db->query("select * from user where id='".$user_id."'")->row_array();
+//                    
+//                   
+//                 }  
+                $outputs['status']        = 'success';
+                $outputs['msg']           = $res['msg'];
+                $outpusts['request_type'] = $res['request_type'];
+    			$outputs['join_key']      = $res['join_key'];    
+    		
+	   	}
+	   	catch (Exception $e)
+        {
+        	$outputs['status']='error';
+			$outputs['msg']   = $e->getMessage(); 
+        } 	
+		
+		echo json_encode($outputs);
+		exit;
    }
    
 	function test()
